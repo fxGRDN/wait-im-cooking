@@ -1,3 +1,16 @@
+# Wait, I'm Cooking!
+
+## Appka do zarządzania przepisami i składnikami.
+### Fajne ficzery do zrobienia:
+- dodawanie przepisow
+- zarządzanie składnikami (ile masz pieprzu, soli itp.)
+- social media z gotowaniem?
+- fajnie było by miec dostep do api sklepow i sprawdzic jakie skladniki w sklepie sa dostepne, ktore sklepy, gdzie
+- funckja zamowienia skladnikow przez sklep, uber cos takiego.
+- polecane resteuracje
+- nie wiem, ogolnie jedzenie, fajna sprawa
+
+
 This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
