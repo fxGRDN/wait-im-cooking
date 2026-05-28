@@ -216,6 +216,15 @@ pub struct CreateHistoryInput {
     pub consume_from_pantry: bool,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateHistoryInput {
+    pub servings_made: Option<i64>,
+    pub duration_min: Option<i64>,
+    pub rating: Option<i64>,
+    pub notes: Option<String>,
+    pub add_image_paths: Vec<String>,
+}
+
 // ─────────────────────────────────────────
 // Availability
 // ─────────────────────────────────────────

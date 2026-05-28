@@ -89,6 +89,41 @@
     --leading-tight: 1.25;
     --leading-normal: 1.5;
     --leading-relaxed: 1.75;
+
+    @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+}
+
+[data-theme="dark"] {
+    --color-background: #1a1512;
+    --color-surface: #241d1a;
+    --color-surface-raised: #2e2622;
+    --color-surface-sunken: #15110f;
+
+    --color-line: #3d322c;
+    --color-line-strong: #4d413a;
+    --color-line-accent: #c8753a;
+
+    --color-foreground: #ede3d6;
+    --color-foreground-muted: #c8b89a;
+    --color-foreground-subtle: #7a5f43;
+
+    --color-accent: #e68d53;
+    --color-accent-hover: #f0a06a;
+    --color-accent-soft: #3d2a1d;
+
+    --color-secondary: #f0b010;
+    --color-secondary-hover: #ffc020;
+    --color-secondary-soft: #3d2d05;
+
+    --color-success: #6bb37e;
+    --color-success-soft: #1d2b20;
+    --color-success-edge: #2e4a34;
+
+    --color-muted: #c8b89a;
+    --color-muted-soft: #2e2622;
+    --color-muted-edge: #4d413a;
+
+    --color-overlay: rgba(0, 0, 0, 0.65);
 }
 
 @layer base {

@@ -90,6 +90,14 @@ pub async fn get_recipe(
 }
 
 #[tauri::command]
+pub async fn search_recipes(
+    query: String,
+    state: State<'_, AppState>,
+) -> Result<Vec<Recipe>, String> {
+    state.recipes.search(&query).await
+}
+
+#[tauri::command]
 pub async fn create_recipe(
     input: CreateRecipeInput,
     state: State<'_, AppState>,
@@ -188,6 +196,15 @@ pub async fn create_cook_log(
     }
 
     Ok(id)
+}
+
+#[tauri::command]
+pub async fn update_cook_log(
+    id: String,
+    input: UpdateHistoryInput,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    state.history.update(&id, input).await
 }
 
 #[tauri::command]

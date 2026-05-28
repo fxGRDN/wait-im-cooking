@@ -28,6 +28,10 @@ export async function getRecipeWithTree(
     return invoke("get_recipe", { id });
 }
 
+export async function searchRecipes(query: string): Promise<Recipe[]> {
+    return invoke("search_recipes", { query });
+}
+
 // ─────────────────────────────────────────
 // Mutations
 // ─────────────────────────────────────────

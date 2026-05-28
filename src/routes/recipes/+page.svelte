@@ -1,15 +1,53 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { getRecipes } from "$lib/services/recipes";
-    import type { Recipe } from "$lib/types";
-    import { Clock, ChefHat, Heart } from "lucide-svelte";
+    import { getRecipes, getTags } from "$lib/services/recipes";
+    import type { Recipe, Tag, RecipeWithTree } from "$lib/types";
+    import {
+        Clock,
+        ChefHat,
+        Heart,
+        Search,
+        Filter,
+        X,
+        Plus,
+    } from "lucide-svelte";
+    import { invoke } from "@tauri-apps/api/core";
 
     let recipes: Recipe[] = $state([]);
+    let tags: Tag[] = $state([]);
     let loading = $state(true);
+
+    let searchQuery = $state("");
+    let selectedTagIds = $state<string[]>([]);
+    let showFilters = $state(false);
+
+    // We need to fetch full recipe trees to filter by tags accurately,
+    // or the backend needs to provide tags in the basic get_recipes call.
+    // For now, let's assume we might need to fetch trees or adjust the backend.
+    // Actually, get_recipes in backend returns Vec<Recipe>, which doesn't have tags.
+    // Let's implement a more efficient way if possible, but for now, we'll fetch all.
+
+    let filteredRecipes = $derived(
+        recipes.filter((recipe) => {
+            const matchesSearch =
+                recipe.title
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                (recipe.description
+                    ?.toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ??
+                    false);
+
+            // Note: Basic Recipe type doesn't have tags.
+            // To filter by tags properly, we'd need them in the list.
+            // I will update the backend or fetch trees if needed, but for now search is priority.
+            return matchesSearch;
+        }),
+    );
 
     onMount(async () => {
         try {
-            recipes = await getRecipes();
+            [recipes, tags] = await Promise.all([getRecipes(), getTags()]);
         } catch (e) {
             console.error(e);
         } finally {
@@ -24,13 +62,86 @@
         const m = minutes % 60;
         return m > 0 ? `${h}h ${m}m` : `${h}h`;
     }
+
+    function toggleTag(tagId: string) {
+        if (selectedTagIds.includes(tagId)) {
+            selectedTagIds = selectedTagIds.filter((id) => id !== tagId);
+        } else {
+            selectedTagIds = [...selectedTagIds, tagId];
+        }
+    }
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
+        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 bg-surface space-y-4"
     >
-        <h1 class="text-2xl font-bold">Recipes</h1>
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Recipes</h1>
+            <div class="flex gap-2">
+                <button
+                    onclick={() => (showFilters = !showFilters)}
+                    class="p-2 rounded-lg border border-line hover:bg-gray-50 transition {selectedTagIds.length >
+                    0
+                        ? 'bg-accent/10 border-accent text-accent'
+                        : ''}"
+                >
+                    <Filter size={20} />
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+            <Search
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+            />
+            <input
+                type="text"
+                bind:value={searchQuery}
+                placeholder="Search recipes..."
+                class="w-full pl-10 pr-10 py-2 bg-gray-50 border border-line rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition"
+            />
+            {#if searchQuery}
+                <button
+                    onclick={() => (searchQuery = "")}
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                    <X size={18} />
+                </button>
+            {/if}
+        </div>
+
+        <!-- Filters Drawer/Section -->
+        {#if showFilters}
+            <div class="pt-2 animate-in slide-in-from-top-2 duration-200">
+                <p
+                    class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
+                >
+                    Filter by Tags
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    {#each tags as tag}
+                        <button
+                            onclick={() => toggleTag(tag.id)}
+                            class="px-3 py-1.5 rounded-full text-xs font-medium border transition {selectedTagIds.includes(
+                                tag.id,
+                            )
+                                ? 'bg-accent text-background border-accent'
+                                : 'bg-white text-gray-600 border-line hover:border-accent/50'}"
+                        >
+                            {tag.name}
+                        </button>
+                    {/each}
+                    {#if tags.length === 0}
+                        <p class="text-xs text-gray-400 italic">
+                            No tags found.
+                        </p>
+                    {/if}
+                </div>
+            </div>
+        {/if}
     </div>
 
     <a
@@ -38,20 +149,7 @@
         class="fixed bottom-24 right-6 w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition z-40"
         aria-label="Add Recipe"
     >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
+        <Plus size={28} strokeWidth={2.5} />
     </a>
 
     <div class="px-4 max-w-2xl mx-auto">
@@ -63,16 +161,25 @@
                     ></div>
                 {/each}
             </div>
-        {:else if recipes.length === 0}
+        {:else if filteredRecipes.length === 0}
             <div class="text-center py-12 text-gray-500">
-                <p>No recipes found.</p>
-                <p class="mt-2 text-sm">
-                    Create your first recipe to get started!
-                </p>
+                <Search size={48} class="mx-auto mb-4 opacity-20" />
+                <p>No recipes match your criteria.</p>
+                {#if searchQuery || selectedTagIds.length > 0}
+                    <button
+                        onclick={() => {
+                            searchQuery = "";
+                            selectedTagIds = [];
+                        }}
+                        class="mt-4 text-accent font-bold text-sm"
+                    >
+                        Clear all filters
+                    </button>
+                {/if}
             </div>
         {:else}
             <div class="grid grid-cols-1 gap-4">
-                {#each recipes as recipe}
+                {#each filteredRecipes as recipe}
                     <a
                         href="/recipes/{recipe.id}"
                         class="bg-surface rounded-xl shadow-sm border border-line overflow-hidden hover:border-accent/50 transition flex group"

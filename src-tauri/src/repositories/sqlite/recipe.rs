@@ -194,6 +194,33 @@ impl RecipeRepository for SqliteRecipeRepository {
         Ok(Some(tree))
     }
 
+    async fn search(&self, query: &str) -> RepoResult<Vec<Recipe>> {
+        let pattern = format!("%{}%", query);
+        let rows = sqlx::query!(
+            "SELECT id, title, description, servings, prep_time, cook_time, is_favourite, cover_image, created_at, updated_at FROM recipes WHERE title LIKE ? OR description LIKE ? ORDER BY created_at DESC",
+            pattern, pattern
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| Recipe {
+                id: r.id.expect("Missing recipe ID"),
+                title: r.title,
+                description: r.description,
+                servings: r.servings,
+                prep_time: r.prep_time,
+                cook_time: r.cook_time,
+                is_favourite: r.is_favourite != 0,
+                cover_image: r.cover_image,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
+            })
+            .collect())
+    }
+
     async fn create(&self, input: CreateRecipeInput) -> RepoResult<String> {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();

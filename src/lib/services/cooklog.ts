@@ -47,6 +47,22 @@ export async function createCookLog(
     });
 }
 
+export async function updateCookLog(
+    id: string,
+    data: Partial<RecipeHistoryInput> & { addImagePaths?: string[] },
+): Promise<void> {
+    return invoke("update_cook_log", {
+        id,
+        input: {
+            servings_made: data.servings_made,
+            duration_min: data.duration_min,
+            rating: data.rating,
+            notes: data.notes,
+            add_image_paths: data.addImagePaths || [],
+        },
+    });
+}
+
 // deletes log entry + cleans up image files from disk
 export async function deleteCookLog(
     id: string,

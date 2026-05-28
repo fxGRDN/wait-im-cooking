@@ -1,7 +1,11 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { page } from "$app/stores";
-    import { getRecipeWithTree, deleteRecipe, toggleFavourite } from "$lib/services/recipes";
+    import {
+        getRecipeWithTree,
+        deleteRecipe,
+        toggleFavourite,
+    } from "$lib/services/recipes";
     import { goto } from "$app/navigation";
     import type { RecipeWithTree } from "$lib/types";
     import {
@@ -13,7 +17,8 @@
         Trash2,
         Edit,
         CheckCircle2,
-        Circle
+        Circle,
+        Play,
     } from "lucide-svelte";
 
     let recipe = $state<RecipeWithTree | null>(null);
@@ -45,7 +50,8 @@
     };
 
     const handleDelete = async () => {
-        if (!recipe || !confirm("Are you sure you want to delete this recipe?")) return;
+        if (!recipe || !confirm("Are you sure you want to delete this recipe?"))
+            return;
         try {
             await deleteRecipe(recipe.id);
             goto("/recipes");
@@ -53,6 +59,10 @@
             console.error(e);
             alert("Failed to delete recipe");
         }
+    };
+
+    const startCooking = () => {
+        goto(`/recipes/${id}/cook`);
     };
 
     function formatTime(minutes: number | null) {
@@ -65,9 +75,14 @@
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
-    <div class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface">
+    <div
+        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
+    >
         <div class="flex items-center gap-2">
-            <a href="/recipes" class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition">
+            <a
+                href="/recipes"
+                class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+            >
                 <ChevronLeft size={24} />
             </a>
             <h1 class="text-xl font-bold truncate max-w-[200px]">
@@ -77,9 +92,14 @@
         <div class="flex items-center gap-1">
             <button
                 onclick={handleToggleFav}
-                class="p-2 hover:bg-gray-100 rounded-full transition {recipe?.is_favourite ? 'text-red-500' : 'text-gray-400'}"
+                class="p-2 hover:bg-gray-100 rounded-full transition {recipe?.is_favourite
+                    ? 'text-red-500'
+                    : 'text-gray-400'}"
             >
-                <Heart size={20} fill={recipe?.is_favourite ? "currentColor" : "none"} />
+                <Heart
+                    size={20}
+                    fill={recipe?.is_favourite ? "currentColor" : "none"}
+                />
             </button>
             <button
                 onclick={handleDelete}
@@ -99,24 +119,42 @@
     {:else if error}
         <div class="px-4 text-center py-12">
             <p class="text-red-500">{error}</p>
-            <a href="/recipes" class="text-accent font-bold mt-4 inline-block">Back to recipes</a>
+            <a href="/recipes" class="text-accent font-bold mt-4 inline-block"
+                >Back to recipes</a
+            >
         </div>
     {:else if recipe}
+        <button
+            onclick={startCooking}
+            class="fixed bottom-24 right-6 bg-accent text-background px-6 py-4 rounded-2xl font-bold shadow-xl shadow-accent/20 flex items-center gap-2 hover:scale-105 transition active:scale-95 z-40"
+        >
+            <Play size={20} fill="currentColor" />
+            Start Cooking
+        </button>
+
         <div class="px-4 max-w-2xl mx-auto space-y-8">
             <!-- Header/Meta -->
             <section class="space-y-4">
                 {#if recipe.cover_image}
-                    <img src={recipe.cover_image} alt={recipe.title} class="w-full h-48 sm:h-64 object-cover rounded-2xl shadow-sm border border-line" />
+                    <img
+                        src={recipe.cover_image}
+                        alt={recipe.title}
+                        class="w-full h-48 sm:h-64 object-cover rounded-2xl shadow-sm border border-line"
+                    />
                 {/if}
 
                 <div class="space-y-2">
                     <h2 class="text-2xl font-bold">{recipe.title}</h2>
                     {#if recipe.description}
-                        <p class="text-gray-600 leading-relaxed">{recipe.description}</p>
+                        <p class="text-gray-600 leading-relaxed">
+                            {recipe.description}
+                        </p>
                     {/if}
                 </div>
 
-                <div class="flex flex-wrap gap-4 py-4 border-y border-line text-sm font-medium text-gray-500">
+                <div
+                    class="flex flex-wrap gap-4 py-4 border-y border-line text-sm font-medium text-gray-500"
+                >
                     {#if recipe.servings}
                         <div class="flex items-center gap-1.5">
                             <Users size={18} class="text-accent" />
@@ -140,7 +178,9 @@
                 {#if recipe.tags.length > 0}
                     <div class="flex flex-wrap gap-2">
                         {#each recipe.tags as tag}
-                            <span class="px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-bold">
+                            <span
+                                class="px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-bold"
+                            >
                                 {tag.name}
                             </span>
                         {/each}
@@ -154,29 +194,50 @@
                     <ChefHat size={20} class="text-accent" />
                     Ingredients
                 </h3>
-                <div class="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
+                <div
+                    class="bg-white rounded-2xl border border-line overflow-hidden shadow-sm"
+                >
                     <ul class="divide-y divide-line">
                         {#each recipe.ingredients as ri}
-                            <li class="p-4 flex justify-between items-center hover:bg-gray-50 transition">
+                            <li
+                                class="p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                            >
                                 <div class="flex flex-col">
-                                    <span class="font-medium {ri.is_optional ? 'text-gray-400' : ''}">
+                                    <span
+                                        class="font-medium {ri.is_optional
+                                            ? 'text-gray-400'
+                                            : ''}"
+                                    >
                                         {ri.ingredient.name}
                                         {#if ri.is_optional}
-                                            <span class="text-xs font-normal ml-1">(optional)</span>
+                                            <span
+                                                class="text-xs font-normal ml-1"
+                                                >(optional)</span
+                                            >
                                         {/if}
                                     </span>
                                 </div>
-                                <span class="text-sm font-bold bg-gray-100 px-2 py-1 rounded-lg">
-                                    {ri.quantity} {ri.unit}
+                                <span
+                                    class="text-sm font-bold bg-gray-100 px-2 py-1 rounded-lg"
+                                >
+                                    {ri.quantity}
+                                    {ri.unit}
                                 </span>
                             </li>
                         {/each}
                         {#each recipe.components as comp}
-                            <li class="p-4 flex justify-between items-center hover:bg-gray-50 transition">
-                                <a href="/recipes/{comp.child.id}" class="font-medium text-accent hover:underline">
+                            <li
+                                class="p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                            >
+                                <a
+                                    href="/recipes/{comp.child.id}"
+                                    class="font-medium text-accent hover:underline"
+                                >
                                     {comp.child.title} (sub-recipe)
                                 </a>
-                                <span class="text-sm font-bold bg-accent/10 text-accent px-2 py-1 rounded-lg">
+                                <span
+                                    class="text-sm font-bold bg-accent/10 text-accent px-2 py-1 rounded-lg"
+                                >
                                     {comp.servings_needed} servings
                                 </span>
                             </li>
@@ -195,7 +256,9 @@
                     {#each recipe.steps as step, i}
                         <div class="flex gap-4">
                             <div class="flex flex-col items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-accent text-background flex items-center justify-center font-bold flex-shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-accent text-background flex items-center justify-center font-bold flex-shrink-0"
+                                >
                                     {i + 1}
                                 </div>
                                 {#if i < recipe.steps.length - 1}
@@ -203,18 +266,30 @@
                                 {/if}
                             </div>
                             <div class="flex-1 pb-6">
-                                <div class="bg-white p-4 rounded-2xl border border-line shadow-sm space-y-2">
-                                    <div class="flex justify-between items-start">
-                                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                <div
+                                    class="bg-white p-4 rounded-2xl border border-line shadow-sm space-y-2"
+                                >
+                                    <div
+                                        class="flex justify-between items-start"
+                                    >
+                                        <span
+                                            class="text-xs font-bold uppercase tracking-wider text-gray-400"
+                                        >
                                             {step.step_type}
                                         </span>
                                         {#if step.duration_min}
-                                            <span class="text-xs font-bold text-accent bg-accent/5 px-2 py-0.5 rounded-full">
+                                            <span
+                                                class="text-xs font-bold text-accent bg-accent/5 px-2 py-0.5 rounded-full"
+                                            >
                                                 {formatTime(step.duration_min)}
                                             </span>
                                         {/if}
                                     </div>
-                                    <p class="text-gray-700 whitespace-pre-wrap">{step.description}</p>
+                                    <p
+                                        class="text-gray-700 whitespace-pre-wrap"
+                                    >
+                                        {step.description}
+                                    </p>
                                 </div>
                             </div>
                         </div>

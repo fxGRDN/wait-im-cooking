@@ -59,6 +59,9 @@ async fn init_db(app: &tauri::App) -> SqlitePool {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let pool = tauri::async_runtime::block_on(init_db(app));
 
@@ -89,6 +92,7 @@ pub fn run() {
             // recipes
             commands::get_recipes,
             commands::get_recipe,
+            commands::search_recipes,
             commands::create_recipe,
             commands::update_recipe,
             commands::delete_recipe,
@@ -102,6 +106,7 @@ pub fn run() {
             commands::get_cook_logs,
             commands::get_cook_log,
             commands::create_cook_log,
+            commands::update_cook_log,
             commands::delete_cook_log,
             // pantry
             commands::check_availability,
