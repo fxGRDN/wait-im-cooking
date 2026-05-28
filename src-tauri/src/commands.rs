@@ -12,6 +12,13 @@ pub async fn get_ingredients(state: State<'_, AppState>) -> Result<Vec<Ingredien
 }
 
 #[tauri::command]
+pub async fn get_inventory(
+    state: State<'_, AppState>,
+) -> Result<Vec<IngredientWithInventory>, String> {
+    state.ingredients.find_inventory().await
+}
+
+#[tauri::command]
 pub async fn get_ingredient(
     id: String,
     state: State<'_, AppState>,

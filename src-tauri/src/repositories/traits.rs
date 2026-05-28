@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use crate::models::*;
+use async_trait::async_trait;
 
 pub type RepoResult<T> = Result<T, String>;
 
@@ -10,6 +10,7 @@ pub type RepoResult<T> = Result<T, String>;
 #[async_trait]
 pub trait IngredientRepository: Send + Sync {
     async fn find_all(&self) -> RepoResult<Vec<Ingredient>>;
+    async fn find_inventory(&self) -> RepoResult<Vec<IngredientWithInventory>>;
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Ingredient>>;
     async fn find_with_inventory(&self, id: &str) -> RepoResult<Option<IngredientWithInventory>>;
     async fn search(&self, query: &str) -> RepoResult<Vec<Ingredient>>;

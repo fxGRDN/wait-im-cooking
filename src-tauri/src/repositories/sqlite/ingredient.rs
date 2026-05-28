@@ -27,6 +27,46 @@ impl IngredientRepository for SqliteIngredientRepository {
         .map_err(|e| e.to_string())
     }
 
+    async fn find_inventory(&self) -> RepoResult<Vec<IngredientWithInventory>> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT
+                i.id as "id!",
+                i.name,
+                i.default_unit,
+                ii.id         AS inv_id,
+                ii.quantity   AS inv_quantity,
+                ii.unit       AS inv_unit,
+                ii.expires_at AS inv_expires_at
+            FROM ingredients i
+            INNER JOIN ingredient_inventory ii ON ii.ingredient_id = i.id
+            ORDER BY i.name ASC
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| {
+                let id = r.id;
+                IngredientWithInventory {
+                    id: id.clone(),
+                    name: r.name,
+                    default_unit: r.default_unit,
+                    inventory: Some(IngredientInventory {
+                        id: r.inv_id.expect("IngridientInventory id is missing!"),
+                        ingredient_id: id,
+                        quantity: r.inv_quantity,
+                        unit: r.inv_unit,
+                        expires_at: r.inv_expires_at,
+                    }),
+                }
+            })
+            .collect())
+    }
+
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Ingredient>> {
         sqlx::query_as!(
             Ingredient,

@@ -78,6 +78,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             // ingredients
             commands::get_ingredients,
+            commands::get_inventory,
             commands::get_ingredient,
             commands::search_ingredients,
             commands::create_ingredient,
