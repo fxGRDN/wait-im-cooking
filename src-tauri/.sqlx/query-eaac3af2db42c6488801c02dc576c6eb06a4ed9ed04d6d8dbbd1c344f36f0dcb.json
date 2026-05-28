@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO ingredient_inventory (id, ingredient_id, quantity, unit, expires_at) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "eaac3af2db42c6488801c02dc576c6eb06a4ed9ed04d6d8dbbd1c344f36f0dcb"
+}

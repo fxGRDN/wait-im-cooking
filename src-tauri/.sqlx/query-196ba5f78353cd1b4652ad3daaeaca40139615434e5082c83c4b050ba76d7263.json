@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                i.id as \"id!\",\n                i.name,\n                i.default_unit,\n                ii.id         AS inv_id,\n                ii.quantity   AS inv_quantity,\n                ii.unit       AS inv_unit,\n                ii.expires_at AS inv_expires_at\n            FROM ingredients i\n            LEFT JOIN ingredient_inventory ii ON ii.ingredient_id = i.id\n            WHERE i.id = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "default_unit",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "inv_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "inv_quantity",
+        "ordinal": 4,
+        "type_info": "Float"
+      },
+      {
+        "name": "inv_unit",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "inv_expires_at",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "196ba5f78353cd1b4652ad3daaeaca40139615434e5082c83c4b050ba76d7263"
+}

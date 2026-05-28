@@ -5,6 +5,8 @@
         upsertInventory,
     } from "$lib/services/ingredients";
 
+    import { fly } from "svelte/transition";
+
     let {
         open = $bindable(false),
         onAdd,

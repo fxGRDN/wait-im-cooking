@@ -3,6 +3,7 @@
     import { getDb, isTauriRuntime } from "$lib/db/index";
     import { initTheme, theme } from "$lib/stores/theme";
     import BottomNav from "$lib/components/BottomNav.svelte";
+    import TopLoadingBar from "$lib/components/TopLoadingBar.svelte";
     import "./layout.css";
     let { children } = $props();
 
@@ -21,6 +22,7 @@
     });
 </script>
 
+<TopLoadingBar />
 <div class="flex min-h-dvh flex-col">
     <main class="flex-1">
         {@render children()}

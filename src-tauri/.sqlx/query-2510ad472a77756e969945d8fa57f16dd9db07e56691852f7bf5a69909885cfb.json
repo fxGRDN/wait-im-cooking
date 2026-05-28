@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO recipe_history_images (id, history_id, file_path, created_at) VALUES (?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "2510ad472a77756e969945d8fa57f16dd9db07e56691852f7bf5a69909885cfb"
+}

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT quantity FROM ingredient_inventory WHERE ingredient_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "quantity",
+        "ordinal": 0,
+        "type_info": "Float"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "cf87096c0c1ce693c5dc7b6f1e04ed461d2623db1628539efb3b64600977b80a"
+}

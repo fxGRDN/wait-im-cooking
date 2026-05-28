@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, recipe_id, step_order, step_type, description, duration_min FROM steps WHERE recipe_id = ? ORDER BY step_order ASC",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "recipe_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "step_order",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "step_type",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "description",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "duration_min",
+        "ordinal": 5,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "992ea2a17fd2cf22a438e6d7bcc954bbd15ce9c2c9a07a114e4014c792283efc"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE ingredient_inventory SET quantity = MAX(0, quantity - ?) WHERE ingredient_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "51fded961f5b9ebaa1a200655fff90411e75cc313ecb5a0c895a06bf694db563"
+}

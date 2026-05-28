@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id as \"id!\", recipe_id, servings_made, duration_min, rating, notes, created_at FROM recipe_history WHERE recipe_id = ? ORDER BY created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "recipe_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "servings_made",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "duration_min",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "rating",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "notes",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "b7a68169d2cc62824c608211ed334b4118612e49a2194a3123e1e954d9655fc8"
+}

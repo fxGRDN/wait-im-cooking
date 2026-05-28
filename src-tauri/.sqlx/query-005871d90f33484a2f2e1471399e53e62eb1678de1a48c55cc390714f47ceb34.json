@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE ingredient_inventory SET quantity = ?, unit = ?, expires_at = ? WHERE ingredient_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "005871d90f33484a2f2e1471399e53e62eb1678de1a48c55cc390714f47ceb34"
+}

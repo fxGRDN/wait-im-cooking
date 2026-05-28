@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO recipe_history (id, recipe_id, servings_made, duration_min, rating, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "715dcafea66cd0dac26499cb66c00417bb1c6de69e2892f86d7cf8405417aac4"
+}

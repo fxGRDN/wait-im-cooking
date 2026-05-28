@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM ingredient_inventory WHERE ingredient_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "6197b073654ed6cfd5c3a1187d3036cf996e136af2c22209874c5d131d645553"
+}

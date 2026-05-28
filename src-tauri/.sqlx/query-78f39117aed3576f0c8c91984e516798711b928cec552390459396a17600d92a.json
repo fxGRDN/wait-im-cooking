@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO recipe_components (parent_id, child_id, servings_needed) VALUES (?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "78f39117aed3576f0c8c91984e516798711b928cec552390459396a17600d92a"
+}

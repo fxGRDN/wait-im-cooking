@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO steps (id, recipe_id, step_order, step_type, description, duration_min) VALUES (?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "e1acb6b158598207c5bb213a3042a14455cfc4fc2525ab3d64f494cc405fb0f5"
+}

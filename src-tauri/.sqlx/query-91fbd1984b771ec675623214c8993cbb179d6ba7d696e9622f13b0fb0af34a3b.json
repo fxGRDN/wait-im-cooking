@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            WITH RECURSIVE ancestors(id) AS (\n                SELECT parent_id FROM recipe_components WHERE child_id = ?\n                UNION ALL\n                SELECT rc.parent_id FROM recipe_components rc\n                JOIN ancestors a ON a.id = rc.child_id\n            )\n            SELECT id FROM ancestors\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "91fbd1984b771ec675623214c8993cbb179d6ba7d696e9622f13b0fb0af34a3b"
+}
