@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE recipe_history SET servings_made = ?, duration_min = ?, rating = ?, notes = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "55706615e04a1e4ed4adbf0bdfecc5f682da558beb655e4b3880cb3e9d04a64b"
+}

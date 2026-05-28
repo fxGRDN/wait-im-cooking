@@ -81,7 +81,7 @@
             <div class="flex gap-2">
                 <button
                     onclick={() => (showFilters = !showFilters)}
-                    class="p-2 rounded-lg border border-line hover:bg-gray-50 transition {selectedTagIds.length >
+                    class="p-2 rounded-lg border border-line hover:bg-surface-raised transition {selectedTagIds.length >
                     0
                         ? 'bg-accent/10 border-accent text-accent'
                         : ''}"
@@ -94,19 +94,19 @@
         <!-- Search Bar -->
         <div class="relative">
             <Search
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-subtle"
                 size={18}
             />
             <input
                 type="text"
                 bind:value={searchQuery}
                 placeholder="Search recipes..."
-                class="w-full pl-10 pr-10 py-2 bg-gray-50 border border-line rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition"
+                class="w-full pl-10 pr-10 py-2 bg-surface-sunken border border-line rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition"
             />
             {#if searchQuery}
                 <button
                     onclick={() => (searchQuery = "")}
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-foreground-muted"
                 >
                     <X size={18} />
                 </button>
@@ -117,7 +117,7 @@
         {#if showFilters}
             <div class="pt-2 animate-in slide-in-from-top-2 duration-200">
                 <p
-                    class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
+                    class="text-xs font-bold text-foreground-subtle uppercase tracking-widest mb-2"
                 >
                     Filter by Tags
                 </p>
@@ -129,13 +129,13 @@
                                 tag.id,
                             )
                                 ? 'bg-accent text-background border-accent'
-                                : 'bg-white text-gray-600 border-line hover:border-accent/50'}"
+                                : 'bg-surface text-foreground-muted border-line hover:border-accent/50'}"
                         >
                             {tag.name}
                         </button>
                     {/each}
                     {#if tags.length === 0}
-                        <p class="text-xs text-gray-400 italic">
+                        <p class="text-xs text-foreground-subtle italic">
                             No tags found.
                         </p>
                     {/if}
@@ -157,12 +157,12 @@
             <div class="space-y-4">
                 {#each Array(3) as _}
                     <div
-                        class="animate-pulse bg-white rounded-xl h-24 border border-line"
+                        class="animate-pulse bg-surface-sunken rounded-xl h-24 border border-line"
                     ></div>
                 {/each}
             </div>
         {:else if filteredRecipes.length === 0}
-            <div class="text-center py-12 text-gray-500">
+            <div class="text-center py-12 text-foreground-muted">
                 <Search size={48} class="mx-auto mb-4 opacity-20" />
                 <p>No recipes match your criteria.</p>
                 {#if searchQuery || selectedTagIds.length > 0}
@@ -196,7 +196,7 @@
                             </div>
                         {:else}
                             <div
-                                class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-100 flex items-center justify-center text-gray-400"
+                                class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
                             >
                                 <ChefHat size={32} />
                             </div>
@@ -213,13 +213,13 @@
                                     {#if recipe.is_favourite}
                                         <Heart
                                             size={16}
-                                            class="text-red-500 fill-current"
+                                            class="text-danger fill-current"
                                         />
                                     {/if}
                                 </div>
                                 {#if recipe.description}
                                     <p
-                                        class="text-sm text-gray-600 line-clamp-1 mt-1"
+                                        class="text-sm text-foreground-muted line-clamp-1 mt-1"
                                     >
                                         {recipe.description}
                                     </p>
@@ -227,7 +227,7 @@
                             </div>
 
                             <div
-                                class="flex items-center gap-4 mt-2 text-xs text-gray-500 font-medium"
+                                class="flex items-center gap-4 mt-2 text-xs text-foreground-muted font-medium"
                             >
                                 {#if recipe.prep_time}
                                     <span class="flex items-center gap-1">

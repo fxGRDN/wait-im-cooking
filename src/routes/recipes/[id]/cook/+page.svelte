@@ -170,14 +170,14 @@
     >
         <button
             onclick={() => history.back()}
-            class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+            class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
         >
             <ChevronLeft size={24} />
         </button>
         <div class="text-center flex-1 px-4 truncate">
             <h1 class="text-sm font-bold truncate">{recipe?.title}</h1>
             <p
-                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
+                class="text-[10px] text-foreground-muted uppercase tracking-widest font-bold"
             >
                 {completedSteps.size} of {recipe?.steps.length || 0} Steps Done
             </p>
@@ -186,7 +186,7 @@
     </div>
 
     <!-- Progress Bar -->
-    <div class="h-1 bg-gray-100 w-full sticky top-[65px] z-20">
+    <div class="h-1 bg-surface-sunken w-full sticky top-[65px] z-20">
         <div
             class="h-full bg-accent transition-all duration-500"
             style="width: {progress}%"
@@ -205,7 +205,7 @@
             <section class="space-y-3">
                 <button
                     onclick={() => (showIngredients = !showIngredients)}
-                    class="w-full flex items-center justify-between text-sm font-bold text-gray-400 uppercase tracking-widest"
+                    class="w-full flex items-center justify-between text-sm font-bold text-foreground-subtle uppercase tracking-widest"
                 >
                     <div class="flex items-center gap-2">
                         <ChefHat size={16} />
@@ -221,14 +221,14 @@
 
                 {#if showIngredients}
                     <div
-                        class="bg-white rounded-2xl border border-line shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+                        class="bg-surface rounded-2xl border border-line shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                     >
                         <div class="grid grid-cols-1 divide-y divide-line">
                             {#each recipe.ingredients as ing}
                                 <button
                                     onclick={() =>
                                         toggleIngredient(ing.ingredient_id)}
-                                    class="flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition"
+                                    class="flex items-center gap-3 p-4 text-left hover:bg-surface-raised transition"
                                 >
                                     {#if checkedIngredients.has(ing.ingredient_id)}
                                         <CheckSquare
@@ -238,7 +238,7 @@
                                     {:else}
                                         <Square
                                             size={20}
-                                            class="text-gray-300"
+                                            class="text-foreground-subtle"
                                         />
                                     {/if}
                                     <div
@@ -248,13 +248,13 @@
                                             class="text-sm font-medium {checkedIngredients.has(
                                                 ing.ingredient_id,
                                             )
-                                                ? 'text-gray-400 line-through'
+                                                ? 'text-foreground-subtle line-through'
                                                 : ''}"
                                         >
                                             {ing.ingredient.name}
                                         </span>
                                         <span
-                                            class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md"
+                                            class="text-xs font-bold text-foreground-subtle bg-surface-sunken px-2 py-0.5 rounded-md"
                                         >
                                             {ing.quantity}
                                             {ing.unit}
@@ -270,7 +270,7 @@
             <!-- Steps Section -->
             <section class="space-y-4">
                 <div
-                    class="flex items-center gap-2 text-sm font-bold text-gray-400 uppercase tracking-widest"
+                    class="flex items-center gap-2 text-sm font-bold text-foreground-subtle uppercase tracking-widest"
                 >
                     <Clock size={16} />
                     Steps
@@ -295,8 +295,8 @@
                                     disabled={!unlocked}
                                     class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition z-10
                                         {completed
-                                        ? 'bg-green-500 border-green-500 text-white'
-                                        : 'bg-white border-line text-gray-300 hover:border-accent hover:text-accent'}"
+                                        ? 'bg-success border-success text-white'
+                                        : 'bg-surface border-line text-foreground-subtle hover:border-accent hover:text-accent'}"
                                 >
                                     {#if completed}
                                         <Check size={24} strokeWidth={3} />
@@ -316,9 +316,9 @@
                             <!-- Step Card -->
                             <div class="flex-1 pb-8">
                                 <div
-                                    class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 transition-all
+                                    class="bg-surface p-5 rounded-2xl border shadow-sm space-y-4 transition-all
                                         {completed
-                                        ? 'border-green-100 bg-green-50/20'
+                                        ? 'border-success-edge bg-success-soft/20'
                                         : 'border-line'}
                                         {unlocked ? '' : 'pointer-events-none'}"
                                 >
@@ -326,7 +326,7 @@
                                         class="flex justify-between items-start"
                                     >
                                         <span
-                                            class="text-[10px] font-bold uppercase tracking-wider text-gray-400"
+                                            class="text-[10px] font-bold uppercase tracking-wider text-foreground-subtle"
                                         >
                                             {step.step_type}
                                         </span>
@@ -391,7 +391,7 @@
                                                     <button
                                                         onclick={() =>
                                                             startTimer(step)}
-                                                        class="flex items-center gap-1.5 bg-gray-50 hover:bg-accent/10 text-gray-400 hover:text-accent px-2 py-1 rounded-lg transition"
+                                                        class="flex items-center gap-1.5 bg-surface-sunken hover:bg-accent/10 text-foreground-subtle hover:text-accent px-2 py-1 rounded-lg transition"
                                                     >
                                                         <Clock size={14} />
                                                         <span
@@ -410,8 +410,8 @@
 
                                     <p
                                         class="text-sm font-medium leading-relaxed {completed
-                                            ? 'text-gray-400'
-                                            : 'text-gray-800'}"
+                                            ? 'text-foreground-subtle'
+                                            : 'text-foreground'}"
                                     >
                                         {step.description}
                                     </p>
@@ -437,11 +437,11 @@
         <!-- Finish Action -->
         {#if completedSteps.size === recipe.steps.length}
             <div
-                class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t border-line z-30 animate-in slide-in-from-bottom-full duration-500"
+                class="fixed bottom-0 left-0 right-0 p-4 bg-surface/80 backdrop-blur-lg border-t border-line z-30 animate-in slide-in-from-bottom-full duration-500"
             >
                 <button
                     onclick={handleComplete}
-                    class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-green-700 transition flex items-center justify-center gap-2"
+                    class="w-full bg-success text-white py-4 rounded-2xl font-bold shadow-lg shadow-success-soft hover:opacity-90 transition flex items-center justify-center gap-2"
                 >
                     <CheckCircle2 size={20} />
                     Recipe Completed!

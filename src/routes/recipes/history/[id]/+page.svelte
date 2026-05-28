@@ -151,7 +151,7 @@
         <div class="flex items-center gap-2">
             <button
                 onclick={() => history.back()}
-                class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+                class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
             >
                 <ChevronLeft size={24} />
             </button>
@@ -160,7 +160,7 @@
         <div class="flex gap-2">
             <button
                 onclick={handleDelete}
-                class="p-2 text-gray-400 hover:text-red-500 transition"
+                class="p-2 text-foreground-subtle hover:text-danger transition"
             >
                 <Trash2 size={20} />
             </button>
@@ -183,8 +183,8 @@
         <div
             class="flex flex-col items-center justify-center py-20 animate-pulse"
         >
-            <div class="w-16 h-16 bg-gray-100 rounded-2xl mb-4"></div>
-            <div class="h-4 bg-gray-100 w-32 rounded"></div>
+            <div class="w-16 h-16 bg-surface-sunken rounded-2xl mb-4"></div>
+            <div class="h-4 bg-surface-sunken w-32 rounded"></div>
         </div>
     {:else if log && recipe}
         <main
@@ -192,14 +192,14 @@
         >
             <header class="text-center space-y-2">
                 <div
-                    class="inline-flex items-center gap-2 bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2"
+                    class="inline-flex items-center gap-2 bg-success-soft text-success px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2"
                 >
                     <CheckCircle2 size={14} />
                     Session Completed
                 </div>
                 <h2 class="text-2xl font-bold">{recipe.title}</h2>
                 <div
-                    class="flex items-center justify-center gap-2 text-sm text-gray-500 font-medium"
+                    class="flex items-center justify-center gap-2 text-sm text-foreground-muted font-medium"
                 >
                     <Calendar size={14} />
                     {formatDate(log.history.created_at)}
@@ -210,7 +210,7 @@
             <section class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h3
-                        class="text-xs font-bold text-gray-400 uppercase tracking-widest"
+                        class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
                     >
                         Gallery
                     </h3>
@@ -266,7 +266,7 @@
                     {#if log.images.length === 0 && newImages.length === 0}
                         <button
                             onclick={pickImages}
-                            class="w-full aspect-video bg-gray-50 rounded-3xl border-2 border-dashed border-line flex flex-col items-center justify-center text-gray-400 gap-2 hover:bg-gray-100 transition"
+                            class="w-full aspect-video bg-surface-sunken rounded-3xl border-2 border-dashed border-line flex flex-col items-center justify-center text-foreground-subtle gap-2 hover:bg-surface-raised transition"
                         >
                             <Camera size={32} strokeWidth={1.5} />
                             <span
@@ -281,10 +281,10 @@
             <!-- Stats -->
             <section class="grid grid-cols-2 gap-4">
                 <div
-                    class="bg-white p-4 rounded-3xl border border-line shadow-sm space-y-1"
+                    class="bg-surface p-4 rounded-3xl border border-line shadow-sm space-y-1"
                 >
                     <label
-                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1"
+                        class="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest flex items-center gap-1"
                     >
                         <ChefHat size={12} />
                         Servings
@@ -296,10 +296,10 @@
                     />
                 </div>
                 <div
-                    class="bg-white p-4 rounded-3xl border border-line shadow-sm space-y-1"
+                    class="bg-surface p-4 rounded-3xl border border-line shadow-sm space-y-1"
                 >
                     <label
-                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1"
+                        class="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest flex items-center gap-1"
                     >
                         <Clock size={12} />
                         Duration (m)
@@ -314,10 +314,10 @@
 
             <!-- Rating -->
             <section
-                class="bg-white p-6 rounded-3xl border border-line shadow-sm text-center space-y-4"
+                class="bg-surface p-6 rounded-3xl border border-line shadow-sm text-center space-y-4"
             >
                 <h3
-                    class="text-xs font-bold text-gray-400 uppercase tracking-widest"
+                    class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
                 >
                     Rate your cook
                 </h3>
@@ -330,8 +330,8 @@
                             <Star
                                 size={40}
                                 class={i < rating
-                                    ? "text-amber-500 fill-current"
-                                    : "text-gray-200"}
+                                    ? "text-secondary fill-current"
+                                    : "text-line"}
                             />
                         </button>
                     {/each}
@@ -341,7 +341,7 @@
             <!-- Notes -->
             <section class="space-y-3">
                 <h3
-                    class="text-xs font-bold text-gray-400 uppercase tracking-widest"
+                    class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
                 >
                     Cooking Notes
                 </h3>
@@ -349,7 +349,7 @@
                     bind:value={notes}
                     placeholder="How was the texture? Any spices to add next time?"
                     rows="5"
-                    class="w-full bg-white border border-line rounded-3xl p-6 text-sm resize-none shadow-sm focus:ring-accent/20 focus:border-accent transition"
+                    class="w-full bg-surface border border-line rounded-3xl p-6 text-sm resize-none shadow-sm focus:ring-accent/20 focus:border-accent transition"
                 ></textarea>
             </section>
         </main>

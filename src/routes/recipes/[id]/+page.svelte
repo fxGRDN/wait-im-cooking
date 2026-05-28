@@ -81,7 +81,7 @@
         <div class="flex items-center gap-2">
             <a
                 href="/recipes"
-                class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+                class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
             >
                 <ChevronLeft size={24} />
             </a>
@@ -92,9 +92,9 @@
         <div class="flex items-center gap-1">
             <button
                 onclick={handleToggleFav}
-                class="p-2 hover:bg-gray-100 rounded-full transition {recipe?.is_favourite
-                    ? 'text-red-500'
-                    : 'text-gray-400'}"
+                class="p-2 hover:bg-surface-sunken rounded-full transition {recipe?.is_favourite
+                    ? 'text-danger'
+                    : 'text-foreground-subtle'}"
             >
                 <Heart
                     size={20}
@@ -103,7 +103,7 @@
             </button>
             <button
                 onclick={handleDelete}
-                class="p-2 hover:bg-gray-100 rounded-full transition text-gray-400 hover:text-red-500"
+                class="p-2 hover:bg-surface-sunken rounded-full transition text-foreground-subtle hover:text-danger"
             >
                 <Trash2 size={20} />
             </button>
@@ -112,13 +112,13 @@
 
     {#if loading}
         <div class="px-4 max-w-2xl mx-auto space-y-4 animate-pulse">
-            <div class="h-48 bg-gray-100 rounded-2xl w-full"></div>
-            <div class="h-8 bg-gray-100 rounded w-3/4"></div>
-            <div class="h-4 bg-gray-100 rounded w-1/2"></div>
+            <div class="h-48 bg-surface-sunken rounded-2xl w-full"></div>
+            <div class="h-8 bg-surface-sunken rounded w-3/4"></div>
+            <div class="h-4 bg-surface-sunken rounded w-1/2"></div>
         </div>
     {:else if error}
         <div class="px-4 text-center py-12">
-            <p class="text-red-500">{error}</p>
+            <p class="text-danger">{error}</p>
             <a href="/recipes" class="text-accent font-bold mt-4 inline-block"
                 >Back to recipes</a
             >
@@ -146,14 +146,14 @@
                 <div class="space-y-2">
                     <h2 class="text-2xl font-bold">{recipe.title}</h2>
                     {#if recipe.description}
-                        <p class="text-gray-600 leading-relaxed">
+                        <p class="text-foreground-muted leading-relaxed">
                             {recipe.description}
                         </p>
                     {/if}
                 </div>
 
                 <div
-                    class="flex flex-wrap gap-4 py-4 border-y border-line text-sm font-medium text-gray-500"
+                    class="flex flex-wrap gap-4 py-4 border-y border-line text-sm font-medium text-foreground-muted"
                 >
                     {#if recipe.servings}
                         <div class="flex items-center gap-1.5">
@@ -195,17 +195,17 @@
                     Ingredients
                 </h3>
                 <div
-                    class="bg-white rounded-2xl border border-line overflow-hidden shadow-sm"
+                    class="bg-surface rounded-2xl border border-line overflow-hidden shadow-sm"
                 >
                     <ul class="divide-y divide-line">
                         {#each recipe.ingredients as ri}
                             <li
-                                class="p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                                class="p-4 flex justify-between items-center hover:bg-surface-raised transition"
                             >
                                 <div class="flex flex-col">
                                     <span
                                         class="font-medium {ri.is_optional
-                                            ? 'text-gray-400'
+                                            ? 'text-foreground-subtle'
                                             : ''}"
                                     >
                                         {ri.ingredient.name}
@@ -218,7 +218,7 @@
                                     </span>
                                 </div>
                                 <span
-                                    class="text-sm font-bold bg-gray-100 px-2 py-1 rounded-lg"
+                                    class="text-sm font-bold bg-surface-sunken px-2 py-1 rounded-lg"
                                 >
                                     {ri.quantity}
                                     {ri.unit}
@@ -227,7 +227,7 @@
                         {/each}
                         {#each recipe.components as comp}
                             <li
-                                class="p-4 flex justify-between items-center hover:bg-gray-50 transition"
+                                class="p-4 flex justify-between items-center hover:bg-surface-raised transition"
                             >
                                 <a
                                     href="/recipes/{comp.child.id}"
@@ -267,13 +267,13 @@
                             </div>
                             <div class="flex-1 pb-6">
                                 <div
-                                    class="bg-white p-4 rounded-2xl border border-line shadow-sm space-y-2"
+                                    class="bg-surface p-4 rounded-2xl border border-line shadow-sm space-y-2"
                                 >
                                     <div
                                         class="flex justify-between items-start"
                                     >
                                         <span
-                                            class="text-xs font-bold uppercase tracking-wider text-gray-400"
+                                            class="text-xs font-bold uppercase tracking-wider text-foreground-subtle"
                                         >
                                             {step.step_type}
                                         </span>
@@ -286,7 +286,7 @@
                                         {/if}
                                     </div>
                                     <p
-                                        class="text-gray-700 whitespace-pre-wrap"
+                                        class="text-foreground whitespace-pre-wrap"
                                     >
                                         {step.description}
                                     </p>

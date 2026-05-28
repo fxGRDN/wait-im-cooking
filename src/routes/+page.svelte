@@ -74,7 +74,7 @@
                     Wait, I'm cooking
                 </h1>
                 <p
-                    class="text-xs text-gray-500 mt-1 font-medium uppercase tracking-wider"
+                    class="text-xs text-foreground-muted mt-1 font-medium uppercase tracking-wider"
                 >
                     Kitchen Dashboard
                 </p>
@@ -85,17 +85,21 @@
     <div class="px-4 max-w-2xl mx-auto space-y-8 mt-6">
         {#if loading}
             <div class="space-y-6">
-                <div class="h-40 bg-gray-100 rounded-2xl animate-pulse"></div>
-                <div class="h-64 bg-gray-100 rounded-2xl animate-pulse"></div>
+                <div
+                    class="h-40 bg-surface-sunken rounded-2xl animate-pulse"
+                ></div>
+                <div
+                    class="h-64 bg-surface-sunken rounded-2xl animate-pulse"
+                ></div>
             </div>
         {:else}
             <!-- Running Low Section -->
             <section class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h2
-                        class="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"
+                        class="text-sm font-bold text-foreground-subtle uppercase tracking-widest flex items-center gap-2"
                     >
-                        <AlertTriangle size={16} class="text-amber-500" />
+                        <AlertTriangle size={16} class="text-secondary" />
                         Running Low
                     </h2>
                     <a
@@ -107,34 +111,34 @@
 
                 {#if lowIngredients.length === 0}
                     <div
-                        class="bg-white p-6 rounded-2xl border border-line text-center"
+                        class="bg-surface p-6 rounded-2xl border border-line text-center"
                     >
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-foreground-muted">
                             Pantry is well stocked!
                         </p>
                     </div>
                 {:else}
                     <div
-                        class="bg-white rounded-2xl border border-line shadow-sm overflow-hidden"
+                        class="bg-surface rounded-2xl border border-line shadow-sm overflow-hidden"
                     >
                         <ul class="divide-y divide-line">
                             {#each lowIngredients as item}
                                 <li
-                                    class="p-4 flex items-center justify-between hover:bg-gray-50 transition"
+                                    class="p-4 flex items-center justify-between hover:bg-surface-raised transition"
                                 >
                                     <div class="flex flex-col">
                                         <span class="font-bold"
                                             >{item.name}</span
                                         >
                                         <span
-                                            class="text-xs text-amber-600 font-medium"
+                                            class="text-xs text-secondary font-medium"
                                             >Only {item.inventory?.quantity}
                                             {item.inventory?.unit} left</span
                                         >
                                     </div>
                                     <a
                                         href="/ingredients"
-                                        class="p-2 text-gray-400 hover:text-accent transition"
+                                        class="p-2 text-foreground-subtle hover:text-accent transition"
                                     >
                                         <ChevronRight size={20} />
                                     </a>
@@ -149,7 +153,7 @@
             <section class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h2
-                        class="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"
+                        class="text-sm font-bold text-foreground-subtle uppercase tracking-widest flex items-center gap-2"
                     >
                         <History size={16} class="text-accent" />
                         Recently Made
@@ -163,18 +167,20 @@
 
                 {#if recentLogs.length === 0}
                     <div
-                        class="bg-white p-10 rounded-2xl border border-dashed border-line text-center space-y-4"
+                        class="bg-surface p-10 rounded-2xl border border-dashed border-line text-center space-y-4"
                     >
                         <div
-                            class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300"
+                            class="w-12 h-12 bg-surface-sunken rounded-full flex items-center justify-center mx-auto text-line-strong"
                         >
                             <TrendingUp size={24} />
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-500">
+                            <p
+                                class="text-sm font-medium text-foreground-muted"
+                            >
                                 No cooking history yet
                             </p>
-                            <p class="text-xs text-gray-400 mt-1">
+                            <p class="text-xs text-foreground-subtle mt-1">
                                 Your recent cooks will appear here.
                             </p>
                         </div>
@@ -190,7 +196,7 @@
                         {#each recentLogs as log}
                             <a
                                 href="/recipes/{log.recipe_id}"
-                                class="bg-white p-4 rounded-2xl border border-line shadow-sm hover:border-accent/50 transition flex items-center gap-4 group"
+                                class="bg-surface p-4 rounded-2xl border border-line shadow-sm hover:border-accent/50 transition flex items-center gap-4 group"
                             >
                                 <div class="flex-1 min-w-0">
                                     <h3
@@ -199,7 +205,7 @@
                                         {getRecipeTitle(log.recipe_id)}
                                     </h3>
                                     <div
-                                        class="flex items-center gap-3 mt-1 text-xs text-gray-500 font-medium"
+                                        class="flex items-center gap-3 mt-1 text-xs text-foreground-muted font-medium"
                                     >
                                         <span class="flex items-center gap-1">
                                             <Clock size={12} />
@@ -207,7 +213,7 @@
                                         </span>
                                         {#if log.rating}
                                             <span
-                                                class="flex items-center gap-0.5 text-amber-500"
+                                                class="flex items-center gap-0.5 text-secondary"
                                             >
                                                 ★ {log.rating}
                                             </span>
@@ -216,7 +222,7 @@
                                 </div>
                                 <ChevronRight
                                     size={18}
-                                    class="text-gray-300 group-hover:text-accent transition"
+                                    class="text-line-strong group-hover:text-accent transition"
                                 />
                             </a>
                         {/each}

@@ -203,7 +203,7 @@
         <div class="flex items-center gap-2">
             <a
                 href="/recipes"
-                class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+                class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
             >
                 <ChevronLeft size={24} />
             </a>
@@ -222,7 +222,7 @@
     <div class="px-4 max-w-2xl mx-auto space-y-8">
         {#if error}
             <div
-                class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 text-sm"
+                class="bg-danger-soft text-danger p-4 rounded-xl border border-danger-edge text-sm"
             >
                 {error}
             </div>
@@ -231,13 +231,13 @@
         <!-- Basic Info -->
         <section class="space-y-4">
             <div
-                class="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider"
+                class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
             >
                 <Info size={16} />
                 <span>General Information</span>
             </div>
             <div
-                class="bg-white p-4 rounded-xl border border-line space-y-4 shadow-sm"
+                class="bg-surface p-4 rounded-xl border border-line space-y-4 shadow-sm"
             >
                 <div class="space-y-1">
                     <label for="title" class="text-sm font-medium"
@@ -247,7 +247,7 @@
                         id="title"
                         bind:value={title}
                         placeholder="e.g. Classic Carbonara"
-                        class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition"
+                        class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition"
                     />
                 </div>
                 <div class="space-y-1">
@@ -259,7 +259,7 @@
                         bind:value={description}
                         placeholder="Tell a bit about this dish..."
                         rows="3"
-                        class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition resize-none"
+                        class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition resize-none"
                     ></textarea>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
@@ -271,7 +271,7 @@
                             id="servings"
                             type="number"
                             bind:value={servings}
-                            class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 outline-none"
+                            class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 outline-none"
                         />
                     </div>
                     <div class="space-y-1">
@@ -282,7 +282,7 @@
                             id="prep"
                             type="number"
                             bind:value={prepTime}
-                            class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 outline-none"
+                            class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 outline-none"
                         />
                     </div>
                     <div class="space-y-1">
@@ -293,7 +293,7 @@
                             id="cook"
                             type="number"
                             bind:value={cookTime}
-                            class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 outline-none"
+                            class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 outline-none"
                         />
                     </div>
                 </div>
@@ -313,13 +313,13 @@
         <!-- Tags -->
         <section class="space-y-4">
             <div
-                class="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider"
+                class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
             >
                 <TagIcon size={16} />
                 <span>Tags</span>
             </div>
             <div
-                class="bg-white p-4 rounded-xl border border-line shadow-sm space-y-4"
+                class="bg-surface p-4 rounded-xl border border-line shadow-sm space-y-4"
             >
                 <div class="flex flex-wrap gap-2">
                     {#each availableTags as tag}
@@ -329,13 +329,13 @@
                                 tag.id,
                             )
                                 ? 'bg-accent text-background border-accent'
-                                : 'bg-gray-50 text-gray-600 border-line hover:border-accent/50'}"
+                                : 'bg-surface-sunken text-foreground-muted border-line hover:border-accent/50'}"
                         >
                             {tag.name}
                         </button>
                     {/each}
                     {#if availableTags.length === 0}
-                        <p class="text-xs text-gray-400 italic">
+                        <p class="text-xs text-foreground-subtle italic">
                             No tags created yet.
                         </p>
                     {/if}
@@ -345,13 +345,13 @@
                         type="text"
                         bind:value={newTagName}
                         placeholder="New tag name..."
-                        class="flex-1 bg-gray-50 border border-line rounded-lg px-3 py-1.5 text-sm outline-none"
+                        class="flex-1 bg-surface-sunken border border-line rounded-lg px-3 py-1.5 text-sm outline-none"
                         onkeydown={(e) =>
                             e.key === "Enter" && handleCreateTag()}
                     />
                     <button
                         onclick={handleCreateTag}
-                        class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-200 transition"
+                        class="px-3 py-1.5 bg-surface-sunken text-foreground-muted rounded-lg text-sm font-bold hover:bg-surface-raised transition"
                     >
                         Add
                     </button>
@@ -363,7 +363,7 @@
         <section class="space-y-4">
             <div class="flex items-center justify-between">
                 <div
-                    class="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider"
+                    class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
                 >
                     <ChefHat size={16} />
                     <span>Ingredients</span>
@@ -380,13 +380,13 @@
             <div class="space-y-3">
                 {#each recipeIngredients as ing, i}
                     <div
-                        class="flex gap-2 items-start bg-white p-3 rounded-xl border border-line shadow-sm"
+                        class="flex gap-2 items-start bg-surface p-3 rounded-xl border border-line shadow-sm"
                     >
                         <div class="flex-1 space-y-2">
                             <select
                                 bind:value={ing.ingredient_id}
                                 onchange={(e) => handleIngredientChange(i, e)}
-                                class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                             >
                                 <option value="">Select Ingredient</option>
                                 <option
@@ -404,13 +404,13 @@
                                     step="any"
                                     bind:value={ing.quantity}
                                     placeholder="Qty"
-                                    class="w-20 bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                    class="w-20 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                                 />
                                 <input
                                     type="text"
                                     bind:value={ing.unit}
                                     placeholder="Unit"
-                                    class="flex-1 bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                    class="flex-1 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                                 />
                                 <label
                                     class="flex items-center gap-1 px-2 whitespace-nowrap"
@@ -420,7 +420,7 @@
                                         bind:checked={ing.is_optional}
                                         class="w-3 h-3 rounded"
                                     />
-                                    <span class="text-xs text-gray-500"
+                                    <span class="text-xs text-foreground-muted"
                                         >Opt.</span
                                     >
                                 </label>
@@ -428,7 +428,7 @@
                         </div>
                         <button
                             onclick={() => removeIngredient(i)}
-                            class="p-2 text-gray-400 hover:text-red-500 transition"
+                            class="p-2 text-foreground-subtle hover:text-danger transition"
                         >
                             <Trash2 size={18} />
                         </button>
@@ -436,7 +436,7 @@
                 {/each}
                 {#if recipeIngredients.length === 0}
                     <div
-                        class="text-center py-6 border-2 border-dashed border-line rounded-xl text-gray-400 text-sm"
+                        class="text-center py-6 border-2 border-dashed border-line rounded-xl text-foreground-subtle text-sm"
                     >
                         No ingredients added yet.
                     </div>
@@ -448,7 +448,7 @@
         <section class="space-y-4">
             <div class="flex items-center justify-between">
                 <div
-                    class="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider"
+                    class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
                 >
                     <Plus size={16} />
                     <span>Sub-recipes</span>
@@ -464,12 +464,12 @@
             <div class="space-y-3">
                 {#each recipeComponents as comp, i}
                     <div
-                        class="flex gap-2 items-start bg-white p-3 rounded-xl border border-line shadow-sm"
+                        class="flex gap-2 items-start bg-surface p-3 rounded-xl border border-line shadow-sm"
                     >
                         <div class="flex-1 space-y-2">
                             <select
                                 bind:value={comp.child_id}
-                                class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                             >
                                 <option value="">Select Recipe</option>
                                 {#each availableRecipes as r}
@@ -477,19 +477,19 @@
                                 {/each}
                             </select>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-500"
+                                <span class="text-xs text-foreground-muted"
                                     >Need servings:</span
                                 >
                                 <input
                                     type="number"
                                     bind:value={comp.servings_needed}
-                                    class="w-20 bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                    class="w-20 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                                 />
                             </div>
                         </div>
                         <button
                             onclick={() => removeComponent(i)}
-                            class="p-2 text-gray-400 hover:text-red-500 transition"
+                            class="p-2 text-foreground-subtle hover:text-danger transition"
                         >
                             <Trash2 size={18} />
                         </button>
@@ -502,7 +502,7 @@
         <section class="space-y-4 pb-12">
             <div class="flex items-center justify-between">
                 <div
-                    class="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider"
+                    class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
                 >
                     <Clock size={16} />
                     <span>Cooking Steps</span>
@@ -518,25 +518,25 @@
             <div class="space-y-4">
                 {#each recipeSteps as step, i}
                     <div
-                        class="bg-white p-4 rounded-xl border border-line shadow-sm space-y-3 relative"
+                        class="bg-surface p-4 rounded-xl border border-line shadow-sm space-y-3 relative"
                     >
                         <div class="flex justify-between items-center">
                             <span
-                                class="bg-gray-100 text-gray-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                                class="bg-surface-sunken text-foreground-muted w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                             >
                                 {step.step_order}
                             </span>
                             <div class="flex items-center gap-2">
                                 <select
                                     bind:value={step.step_type}
-                                    class="text-xs bg-gray-50 border border-line rounded-md px-2 py-1 outline-none"
+                                    class="text-xs bg-surface-sunken border border-line rounded-md px-2 py-1 outline-none"
                                 >
                                     <option value="prep">Prep</option>
                                     <option value="cook">Cook</option>
                                 </select>
                                 <button
                                     onclick={() => removeStep(i)}
-                                    class="p-1 text-gray-400 hover:text-red-500 transition"
+                                    class="p-1 text-foreground-subtle hover:text-danger transition"
                                 >
                                     <Trash2 size={16} />
                                 </button>
@@ -545,23 +545,23 @@
                         <textarea
                             bind:value={step.description}
                             placeholder="Describe what to do..."
-                            class="w-full bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none resize-none"
+                            class="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none resize-none"
                             rows="2"
                         ></textarea>
                         <div class="flex items-center gap-2">
-                            <Clock size={14} class="text-gray-400" />
+                            <Clock size={14} class="text-foreground-subtle" />
                             <input
                                 type="number"
                                 bind:value={step.duration_min}
                                 placeholder="Duration (min)"
-                                class="w-32 bg-gray-50 border border-line rounded-lg px-3 py-2 text-sm outline-none"
+                                class="w-32 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                             />
                         </div>
                     </div>
                 {/each}
                 {#if recipeSteps.length === 0}
                     <div
-                        class="text-center py-6 border-2 border-dashed border-line rounded-xl text-gray-400 text-sm"
+                        class="text-center py-6 border-2 border-dashed border-line rounded-xl text-foreground-subtle text-sm"
                     >
                         No steps added yet.
                     </div>

@@ -77,7 +77,7 @@
             class="fixed bottom-0 left-0 right-0 z-50 mt-24 flex h-auto flex-col rounded-t-2xl bg-surface text-foreground shadow-lg border-t border-line outline-none pb-8 pt-4 px-4"
         >
             <div
-                class="mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full bg-gray-300"
+                class="mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full bg-line-strong"
             ></div>
 
             <form
@@ -142,16 +142,16 @@
                     />
                 </div>
                 {#if error}
-                    <p class="text-sm text-red-600">{error}</p>
+                    <p class="text-sm text-danger">{error}</p>
                 {/if}
                 <div class="flex justify-end gap-2 mt-4">
                     <Drawer.Close
-                        class="px-3 py-2 text-sm rounded-lg border border-line bg-surface hover:bg-gray-50 transition"
+                        class="px-3 py-2 text-sm rounded-lg border border-line bg-surface hover:bg-surface-raised transition"
                         disabled={saving}>Done</Drawer.Close
                     >
                     <button
                         type="submit"
-                        class="px-3 py-2 text-sm rounded-lg bg-blue-600 text-white disabled:opacity-60 hover:opacity-90 transition"
+                        class="px-3 py-2 text-sm rounded-lg bg-accent text-background disabled:opacity-60 hover:opacity-90 transition"
                         disabled={saving || !name.trim() || !quantity}
                         >{saving ? "Saving..." : "Add"}</button
                     >

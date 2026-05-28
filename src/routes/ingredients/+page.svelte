@@ -36,7 +36,17 @@
         class="fixed bottom-24 right-6 w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition z-40"
         aria-label="Add to Inventory"
     >
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
@@ -46,17 +56,19 @@
         {#if loading}
             <div class="animate-pulse flex space-x-4">
                 <div class="flex-1 space-y-4 py-1">
-                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div class="h-4 bg-line rounded w-3/4"></div>
                     <div class="space-y-2">
-                        <div class="h-4 bg-gray-200 rounded"></div>
-                        <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                        <div class="h-4 bg-line rounded"></div>
+                        <div class="h-4 bg-line rounded w-5/6"></div>
                     </div>
                 </div>
             </div>
         {:else if ingredients.length === 0}
-            <div class="text-center py-12 text-gray-500">
+            <div class="text-center py-12 text-foreground-muted">
                 <p>No inventory items found.</p>
-                <p class="mt-2 text-sm">Add items to your inventory to get started!</p>
+                <p class="mt-2 text-sm">
+                    Add items to your inventory to get started!
+                </p>
             </div>
         {:else}
             <div
@@ -65,13 +77,15 @@
                 <ul class="divide-y divide-line">
                     {#each ingredients as ingredient}
                         <li
-                            class="p-4 hover:bg-gray-50 transition flex justify-between items-center"
+                            class="p-4 hover:bg-surface-raised transition flex justify-between items-center"
                         >
                             <span class="font-medium">{ingredient.name}</span>
                             {#if ingredient.inventory}
                                 <span
-                                    class="text-xs font-semibold text-gray-700 bg-gray-200 px-2 py-1 rounded-md"
-                                    >{ingredient.inventory.quantity} {ingredient.inventory.unit}</span>
+                                    class="text-xs font-semibold text-foreground bg-line px-2 py-1 rounded-md"
+                                    >{ingredient.inventory.quantity}
+                                    {ingredient.inventory.unit}</span
+                                >
                             {/if}
                         </li>
                     {/each}

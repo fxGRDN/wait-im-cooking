@@ -12,6 +12,8 @@
         ChefHat,
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
+    import { redirect } from "@sveltejs/kit";
+    import { goto } from "$app/navigation";
 
     let logs = $state<RecipeHistoryWithImages[]>([]);
     let recipes = $state<Recipe[]>([]);
@@ -56,6 +58,14 @@
             day: "numeric",
         });
     }
+
+    function goToRecipe(id: string) {
+        goto(`/recipes/${id}`);
+    }
+
+    function goToRecipeHistory(id: string) {
+        goto(`/recipes/${id}/history`);
+    }
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
@@ -65,7 +75,7 @@
     >
         <button
             onclick={() => history.back()}
-            class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+            class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
         >
             <ChevronLeft size={24} />
         </button>
@@ -77,12 +87,12 @@
             <div class="space-y-6">
                 {#each Array(3) as _}
                     <div
-                        class="h-64 bg-gray-100 rounded-3xl animate-pulse"
+                        class="h-64 bg-surface-sunken rounded-3xl animate-pulse"
                     ></div>
                 {/each}
             </div>
         {:else if logs.length === 0}
-            <div class="text-center py-20 text-gray-500">
+            <div class="text-center py-20 text-foreground-muted">
                 <Calendar size={48} class="mx-auto mb-4 opacity-20" />
                 <p>No cooking history yet.</p>
                 <a
@@ -95,7 +105,7 @@
             <div class="space-y-8">
                 {#each logs as log}
                     <div
-                        class="bg-white rounded-3xl border border-line shadow-sm overflow-hidden flex flex-col"
+                        class="bg-surface rounded-3xl border border-line shadow-sm overflow-hidden flex flex-col"
                     >
                         <!-- Carousel -->
                         {#if log.images && log.images.length > 0}
@@ -123,7 +133,7 @@
                                     >
                                         {#each log.images as _, i}
                                             <div
-                                                class="w-1.5 h-1.5 rounded-full bg-white/50"
+                                                class="w-1.5 h-1.5 rounded-full bg-surface/50"
                                             ></div>
                                         {/each}
                                     </div>
@@ -136,7 +146,7 @@
                             </div>
                         {:else}
                             <div
-                                class="aspect-video bg-gray-50 flex flex-col items-center justify-center text-gray-300 gap-2 border-b border-line"
+                                class="aspect-video bg-surface-sunken flex flex-col items-center justify-center text-foreground-subtle gap-2 border-b border-line"
                             >
                                 <ImageIcon size={48} strokeWidth={1} />
                                 <span class="text-xs font-medium"
@@ -149,12 +159,12 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3
-                                        class="text-lg font-bold text-gray-900 leading-tight"
+                                        class="text-lg font-bold text-foreground leading-tight"
                                     >
                                         {getRecipeTitle(log.recipe_id)}
                                     </h3>
                                     <div
-                                        class="flex items-center gap-2 mt-1 text-xs text-gray-500 font-medium"
+                                        class="flex items-center gap-2 mt-1 text-xs text-foreground-muted font-medium"
                                     >
                                         <Calendar size={12} />
                                         {formatDate(log.created_at)}
@@ -162,7 +172,7 @@
                                 </div>
                                 {#if log.rating}
                                     <div
-                                        class="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-lg"
+                                        class="flex items-center gap-1 bg-secondary-soft text-secondary px-2 py-1 rounded-lg"
                                     >
                                         <Star size={14} fill="currentColor" />
                                         <span class="font-bold text-sm"
@@ -174,7 +184,7 @@
 
                             {#if log.notes}
                                 <p
-                                    class="text-sm text-gray-600 leading-relaxed italic bg-gray-50 p-4 rounded-2xl border border-gray-100"
+                                    class="text-sm text-foreground-muted leading-relaxed italic bg-surface-sunken p-4 rounded-2xl border border-line"
                                 >
                                     "{log.notes}"
                                 </p>
@@ -183,7 +193,7 @@
                             <div class="flex items-center gap-4 pt-2">
                                 {#if log.servings_made}
                                     <div
-                                        class="flex items-center gap-1.5 text-xs font-bold text-gray-400"
+                                        class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
                                     >
                                         <ChefHat size={14} />
                                         {log.servings_made} SERVINGS
@@ -191,7 +201,7 @@
                                 {/if}
                                 {#if log.duration_min}
                                     <div
-                                        class="flex items-center gap-1.5 text-xs font-bold text-gray-400"
+                                        class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
                                     >
                                         <Clock size={14} />
                                         {log.duration_min} MIN

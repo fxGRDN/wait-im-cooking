@@ -89,43 +89,50 @@
     --leading-tight: 1.25;
     --leading-normal: 1.5;
     --leading-relaxed: 1.75;
-
-    @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 }
+
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 [data-theme="dark"] {
-    --color-background: #1a1512;
-    --color-surface: #241d1a;
-    --color-surface-raised: #2e2622;
-    --color-surface-sunken: #15110f;
+    --color-background: #1c1714;
+    --color-surface: #252019;
+    --color-surface-raised: #2e2820;
+    --color-surface-sunken: #171310;
 
-    --color-line: #3d322c;
-    --color-line-strong: #4d413a;
-    --color-line-accent: #c8753a;
+    --color-line: #3a3028;
+    --color-line-strong: #4a3e34;
+    --color-line-accent: #d4845a;
 
-    --color-foreground: #ede3d6;
-    --color-foreground-muted: #c8b89a;
-    --color-foreground-subtle: #7a5f43;
+    --color-foreground: #f0e6d8;
+    --color-foreground-muted: #b8a090;
+    --color-foreground-subtle: #7a6858;
 
-    --color-accent: #e68d53;
-    --color-accent-hover: #f0a06a;
-    --color-accent-soft: #3d2a1d;
+    --color-accent: #d4845a;
+    --color-accent-hover: #e09870;
+    --color-accent-soft: #2e1f14;
 
-    --color-secondary: #f0b010;
-    --color-secondary-hover: #ffc020;
-    --color-secondary-soft: #3d2d05;
+    --color-secondary: #c8980a;
+    --color-secondary-hover: #daa810;
+    --color-secondary-soft: #2a2005;
 
-    --color-success: #6bb37e;
-    --color-success-soft: #1d2b20;
-    --color-success-edge: #2e4a34;
+    --color-success: #5a9468;
+    --color-success-soft: #182318;
+    --color-success-edge: #2a4030;
 
-    --color-muted: #c8b89a;
-    --color-muted-soft: #2e2622;
-    --color-muted-edge: #4d413a;
+    --color-warning: #a07800;
+    --color-warning-soft: #262010;
+    --color-warning-edge: #4a3a10;
 
-    --color-overlay: rgba(0, 0, 0, 0.65);
+    --color-danger: #c04040;
+    --color-danger-soft: #281818;
+    --color-danger-edge: #4a2020;
+
+    --color-muted: #b8a090;
+    --color-muted-soft: #2e2820;
+    --color-muted-edge: #4a3e34;
+
+    --color-overlay: rgba(0, 0, 0, 0.7);
 }
-
 @layer base {
     :root {
         /* Not in @theme — no utility needed, just used in box-shadow */

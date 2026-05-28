@@ -30,7 +30,7 @@
 </script>
 
 <nav
-    class="border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]"
+    class="sticky bottom-0 border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]"
     aria-label="Primary"
 >
     <ul class="mx-auto grid max-w-md grid-cols-4 gap-1 px-2 py-1">

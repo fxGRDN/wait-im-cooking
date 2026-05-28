@@ -5,7 +5,7 @@
     let {
         open = $bindable(false),
         onCreated,
-        initialName = ""
+        initialName = "",
     }: {
         open: boolean;
         onCreated: (ingredient: any) => void;
@@ -36,7 +36,10 @@
         error = null;
 
         try {
-            const created = await createIngredient(trimmedName, defaultUnit.trim() || null);
+            const created = await createIngredient(
+                trimmedName,
+                defaultUnit.trim() || null,
+            );
             onCreated(created);
             open = false;
         } catch (e) {
@@ -54,7 +57,9 @@
         <Drawer.Content
             class="fixed bottom-0 left-0 right-0 z-50 mt-24 flex h-auto flex-col rounded-t-2xl bg-surface text-foreground shadow-lg border-t border-line outline-none pb-8 pt-4 px-4"
         >
-            <div class="mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full bg-gray-300"></div>
+            <div
+                class="mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full bg-line-strong"
+            ></div>
 
             <form
                 class="space-y-4"
@@ -63,13 +68,17 @@
                     submit();
                 }}
             >
-                <Drawer.Title class="text-lg font-semibold">New Ingredient</Drawer.Title>
-                <Drawer.Description class="text-sm text-gray-500">
+                <Drawer.Title class="text-lg font-semibold"
+                    >New Ingredient</Drawer.Title
+                >
+                <Drawer.Description class="text-sm text-foreground-muted">
                     Create a new ingredient that isn't in your list yet.
                 </Drawer.Description>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium" for="new-ingredient-name">Name</label>
+                    <label class="text-sm font-medium" for="new-ingredient-name"
+                        >Name</label
+                    >
                     <input
                         id="new-ingredient-name"
                         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
@@ -81,7 +90,9 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium" for="new-ingredient-unit">Default Unit (optional)</label>
+                    <label class="text-sm font-medium" for="new-ingredient-unit"
+                        >Default Unit (optional)</label
+                    >
                     <input
                         id="new-ingredient-unit"
                         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
@@ -93,11 +104,13 @@
                 </div>
 
                 {#if error}
-                    <p class="text-sm text-red-600">{error}</p>
+                    <p class="text-sm text-danger">{error}</p>
                 {/if}
 
                 <div class="flex justify-end gap-2 mt-4">
-                    <Drawer.Close class="px-3 py-2 text-sm rounded-lg border border-line bg-surface hover:bg-gray-50 transition">
+                    <Drawer.Close
+                        class="px-3 py-2 text-sm rounded-lg border border-line bg-surface hover:bg-surface-raised transition"
+                    >
                         Cancel
                     </Drawer.Close>
                     <button
