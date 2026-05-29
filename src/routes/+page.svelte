@@ -87,7 +87,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold leading-none">
-                    Wait, I'm cooking
+                    Wait, I'm Cooking!
                 </h1>
                 <p
                     class="text-xs text-foreground-muted mt-1 font-medium uppercase tracking-wider"

@@ -15,15 +15,33 @@ export const test = base.extend({
             case "get_tags":
               return [];
             case "get_ingredients":
-              return [];
+              return [
+                {
+                  id: "ing-1",
+                  name: "Tomato",
+                  default_unit: "g",
+                  restock_threshold: 100,
+                },
+              ];
             case "get_inventory":
+              return [
+                {
+                  id: "ing-1",
+                  name: "Tomato",
+                  default_unit: "g",
+                  restock_threshold: 100,
+                  inventory: { quantity: 500, unit: "g" },
+                },
+              ];
+            case "get_cook_logs":
               return [];
             case "create_recipe":
               return "mock-recipe-id";
             case "get_recipe":
               return {
                 id: "mock-recipe-id",
-                title: args.id === "mock-recipe-id" ? "My Test Recipe" : "Unknown",
+                title:
+                  args.id === "mock-recipe-id" ? "My Test Recipe" : "Unknown",
                 description: "Test Description",
                 servings: 2,
                 prep_time: 10,
@@ -33,10 +51,14 @@ export const test = base.extend({
                 ingredients: [],
                 components: [],
                 steps: [],
-                tags: []
+                tags: [],
               };
             case "create_cook_log":
               return "mock-history-id";
+            case "update_cook_log":
+              return [];
+            case "update_recipe":
+              return null;
             case "get_cook_log":
               return {
                 id: "mock-history-id",
@@ -46,22 +68,22 @@ export const test = base.extend({
                 rating: 5,
                 notes: "Tastes great!",
                 created_at: new Date().toISOString(),
-                images: []
+                images: [],
               };
             default:
               return null;
           }
         },
         metadata: {
-            name: "Wait, I'm Cooking!",
-            version: "0.1.0"
-        }
+          name: "Wait, I'm Cooking!",
+          version: "0.1.0",
+        },
       };
 
       // Mock other possible globals
       (window as any).__TAURI__ = {
         invoke: (window as any).__TAURI_INTERNALS__.invoke,
-        convertFileSrc: (p: string) => p
+        convertFileSrc: (p: string) => p,
       };
     });
     await use(page);

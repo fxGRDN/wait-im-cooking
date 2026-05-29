@@ -104,11 +104,8 @@
                 },
             );
 
-            // Refresh data and exit edit mode
-            log = await getCookLog(id);
-            newImages = [];
-            imagesToRemove = [];
-            isEditing = false;
+            // Redirect back to history list
+            goto("/recipes/history");
         } catch (e) {
             console.error(e);
             alert("Failed to update history.");

@@ -193,14 +193,14 @@
                 (s) => s.description.trim() !== "",
             );
 
-            await createRecipe(
+            const recipeId = await createRecipe(
                 data,
                 filteredIngredients,
                 filteredComponents,
                 filteredSteps,
                 tagIds,
             );
-            goto("/recipes");
+            goto(`/recipes/${recipeId}`);
         } catch (e) {
             console.error(e);
             error = e instanceof Error ? e.message : "Failed to create recipe";
