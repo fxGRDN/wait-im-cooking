@@ -32,6 +32,7 @@
 
     onMount(async () => {
         try {
+            if (!id) error = "Id not found";
             recipe = await getRecipeWithTree(id);
             if (!recipe) error = "Recipe not found";
         } catch (e) {
@@ -93,7 +94,7 @@
             >
                 <ChevronLeft size={24} />
             </a>
-            <h1 class="text-xl font-bold truncate max-w-[200px]">
+            <h1 class="text-xl font-bold truncate max-w-50">
                 {recipe?.title || "Recipe"}
             </h1>
         </div>
@@ -257,7 +258,7 @@
                         <div class="flex gap-4">
                             <div class="flex flex-col items-center gap-2">
                                 <div
-                                    class="w-8 h-8 rounded-full bg-accent text-background flex items-center justify-center font-bold flex-shrink-0"
+                                    class="w-8 h-8 rounded-full bg-accent text-background flex items-center justify-center font-bold shrink-0"
                                 >
                                     {i + 1}
                                 </div>

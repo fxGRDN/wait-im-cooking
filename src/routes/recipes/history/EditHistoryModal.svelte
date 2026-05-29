@@ -20,7 +20,7 @@
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { remove } from "@tauri-apps/plugin-fs";
-    import { pickAndSaveImages } from "$lib/utils";
+    import { saveImages } from "$lib/utils";
 
     let {
         open: isOpen = $bindable(false),
@@ -66,7 +66,7 @@
     }
 
     async function pickImages() {
-        const selected = await pickAndSaveImages("history_images");
+        const selected = await saveImages("history_images");
         newImages = [...newImages, ...selected];
     }
 
@@ -203,7 +203,7 @@
                         >
                             {#each log.images as img}
                                 <div
-                                    class="relative flex-shrink-0 w-24 aspect-square rounded-xl border border-line overflow-hidden shadow-sm"
+                                    class="relative shrink-0 w-24 aspect-square rounded-xl border border-line overflow-hidden shadow-sm"
                                 >
                                     <img
                                         src={convertFileSrc(img.file_path)}
@@ -229,7 +229,7 @@
                             {/each}
                             {#each newImages as img, i}
                                 <div
-                                    class="relative flex-shrink-0 w-24 aspect-square rounded-xl border-2 border-accent border-dashed overflow-hidden shadow-sm"
+                                    class="relative shrink-0 w-24 aspect-square rounded-xl border-2 border-accent border-dashed overflow-hidden shadow-sm"
                                 >
                                     <img
                                         src={convertFileSrc(img)}
@@ -311,7 +311,7 @@
                 <button
                     onclick={handleSave}
                     disabled={saving || loading}
-                    class="flex-[2] bg-accent text-background py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 hover:opacity-90 disabled:opacity-50 transition"
+                    class="flex-2 bg-accent text-background py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 hover:opacity-90 disabled:opacity-50 transition"
                 >
                     {#if saving}
                         <Loader2 size={18} class="animate-spin" />

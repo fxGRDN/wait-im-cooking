@@ -1,6 +1,6 @@
 use crate::models::*;
 use crate::AppState;
-use tauri::{Manager, State};
+use tauri::{State};
 
 // ─────────────────────────────────────────
 // Ingredients
@@ -226,23 +226,4 @@ pub async fn check_availability(
     state: State<'_, AppState>,
 ) -> Result<AvailabilityResult, String> {
     state.pantry.check_availability(&recipe_id).await
-}
-
-#[tauri::command]
-pub async fn save_image(
-    app: tauri::AppHandle,
-    bytes: Vec<u8>,
-    ext: String,
-    folder: String,
-) -> Result<String, String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
-        .join(folder);
-    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-    let file_name = format!("{}.{}", uuid::Uuid::new_v4(), ext);
-    let path = dir.join(&file_name);
-    std::fs::write(&path, bytes).map_err(|e| e.to_string())?;
-    Ok(path.to_string_lossy().to_string())
 }

@@ -121,7 +121,7 @@
                                 >
                                     {#each log.images as img}
                                         <div
-                                            class="flex-shrink-0 w-full aspect-video snap-center"
+                                            class="shrink-0 w-full aspect-video snap-center"
                                         >
                                             <img
                                                 src={convertFileSrc(

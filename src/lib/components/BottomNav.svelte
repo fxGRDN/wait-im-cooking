@@ -36,6 +36,8 @@
     const showAddRecipe = $derived(path === recipesPath);
     const showStartCooking = $derived(
         path.startsWith(recipesPath + "/") &&
+            !path.startsWith(recipesPath + "/add") &&
+            !path.startsWith(recipesPath + "/history") &&
             !path.endsWith("/cook") &&
             path.split("/").length === 3,
     );
@@ -61,7 +63,7 @@
 </script>
 
 <nav
-    class="sticky bottom-0 border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] z-50"
+    class="sticky bottom-0 border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] z-50 touch-none overscroll-none select-none"
     aria-label="Primary"
 >
     <!-- Relative FAB Container -->

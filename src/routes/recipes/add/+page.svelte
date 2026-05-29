@@ -31,7 +31,7 @@
     } from "lucide-svelte";
     import QuickAddIngredient from "./QuickAddIngredient.svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
-    import { pickAndSaveImage } from "$lib/utils";
+    import { saveImages } from "$lib/utils";
 
     let title = $state("");
     let description = $state("");
@@ -201,9 +201,9 @@
     };
 
     async function pickCover() {
-        const savedPath = await pickAndSaveImage("recipe_covers");
+        const savedPath = await saveImages("recipe_covers");
         if (savedPath) {
-            coverImage = savedPath;
+            coverImage = savedPath[0];
         }
     }
 </script>

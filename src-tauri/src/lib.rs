@@ -111,7 +111,6 @@ pub fn run() {
             commands::delete_cook_log,
             // pantry
             commands::check_availability,
-            commands::save_image,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -23,7 +23,7 @@
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { remove } from "@tauri-apps/plugin-fs";
-    import { pickAndSaveImages } from "$lib/utils";
+    import { saveImages } from "$lib/utils";
     import { goto } from "$app/navigation";
 
     const id = $page.params.id as string;
@@ -58,7 +58,7 @@
     });
 
     async function pickImages() {
-        const selected = await pickAndSaveImages("history_images");
+        const selected = await saveImages("history_images", true);
         newImages = [...newImages, ...selected];
     }
 

@@ -323,12 +323,12 @@ impl RecipeRepository for SqliteRecipeRepository {
         }
 
         params.push(id.to_string());
-        let query = format!("UPDATE recipes SET {} WHERE id = ?", sets.join(", "));
-        sqlx::query(&query)
-            .bind(params.join("\x00")) // workaround: use raw query for dynamic params
-            .execute(&self.pool)
-            .await
-            .map_err(|e| e.to_string())?;
+        let query_str = format!("UPDATE recipes SET {} WHERE id = ?", sets.join(", "));
+        let mut query = sqlx::query(&query_str);
+        for param in params {
+            query = query.bind(param);
+        }
+        query.execute(&self.pool).await.map_err(|e| e.to_string())?;
 
         Ok(())
     }

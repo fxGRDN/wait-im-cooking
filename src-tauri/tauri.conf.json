@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "wait-im-cooking",
+  "productName": "Wait, I'm Cooking!",
   "version": "0.1.0",
   "identifier": "com.felix.wait-im-cooking",
   "build": {
@@ -18,7 +18,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' ipc:; img-src 'self' asset: https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline'; connect-src 'self' ipc: https:;",
+      "csp": "default-src 'self' ipc:; img-src 'self' asset: https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline'; connect-src 'self' ipc: https: ws: http://ipc.localhost;",
       "assetProtocol": {
         "enable": true,
         "scope": ["$APPLOCALDATA/**", "$HOME/**"]
