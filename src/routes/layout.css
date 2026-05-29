@@ -70,14 +70,14 @@
     --spacing-12: 48px;
 
     /* === Font-size scale — `text-xs`..`text-3xl` === */
-    --text-xs: 11px;
-    --text-sm: 13px;
-    --text-base: 15px;
-    --text-md: 17px;
-    --text-lg: 20px;
-    --text-xl: 24px;
-    --text-2xl: 30px;
-    --text-3xl: 38px;
+    --text-xs: 0.733rem;
+    --text-sm: 0.867rem;
+    --text-base: 1rem;
+    --text-md: 1.133rem;
+    --text-lg: 1.333rem;
+    --text-xl: 1.6rem;
+    --text-2xl: 2rem;
+    --text-3xl: 2.533rem;
 
     /* === Font weights — `font-normal`, `font-medium`, `font-semibold`, `font-bold` === */
     --font-weight-normal: 400;
@@ -144,6 +144,7 @@
         background-color: var(--color-background);
         color: var(--color-foreground);
         -webkit-font-smoothing: antialiased;
+        font-size: var(--font-size-base, 15px);
     }
 
     h1,

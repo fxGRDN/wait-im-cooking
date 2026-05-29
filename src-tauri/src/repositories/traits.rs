@@ -63,7 +63,7 @@ pub trait RecipeHistoryRepository: Send + Sync {
     async fn find_all(&self, recipe_id: Option<&str>) -> RepoResult<Vec<RecipeHistory>>;
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<RecipeHistoryWithImages>>;
     async fn create(&self, input: CreateHistoryInput) -> RepoResult<String>;
-    async fn update(&self, id: &str, input: UpdateHistoryInput) -> RepoResult<()>;
+    async fn update(&self, id: &str, input: UpdateHistoryInput) -> RepoResult<Vec<String>>; // returns deleted file paths
     async fn delete(&self, id: &str) -> RepoResult<Vec<String>>; // returns file paths to clean up
 }
 

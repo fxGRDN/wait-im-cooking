@@ -11,7 +11,8 @@
         X,
         Plus,
     } from "lucide-svelte";
-    import { invoke } from "@tauri-apps/api/core";
+    import { invoke, convertFileSrc } from "@tauri-apps/api/core";
+    import { settings } from "$lib/stores/settings";
 
     let recipes: Recipe[] = $state([]);
     let tags: Tag[] = $state([]);
@@ -74,7 +75,7 @@
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 bg-surface space-y-4"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 bg-surface space-y-4"
     >
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Recipes</h1>
@@ -144,14 +145,6 @@
         {/if}
     </div>
 
-    <a
-        href="/recipes/add"
-        class="fixed bottom-24 right-6 w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition z-40"
-        aria-label="Add Recipe"
-    >
-        <Plus size={28} strokeWidth={2.5} />
-    </a>
-
     <div class="px-4 max-w-2xl mx-auto">
         {#if loading}
             <div class="space-y-4">
@@ -189,7 +182,7 @@
                                 class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0"
                             >
                                 <img
-                                    src={recipe.cover_image}
+                                    src={convertFileSrc(recipe.cover_image)}
                                     alt={recipe.title}
                                     class="w-full h-full object-cover"
                                 />

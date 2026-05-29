@@ -45,6 +45,21 @@
         } finally {
             loading = false;
         }
+
+        window.addEventListener("complete-cooking", handleComplete);
+        return () =>
+            window.removeEventListener("complete-cooking", handleComplete);
+    });
+
+    $effect(() => {
+        if (recipe) {
+            const isCompleted = completedSteps.size === recipe.steps.length;
+            window.dispatchEvent(
+                new CustomEvent("cook-status", {
+                    detail: { completed: isCompleted },
+                }),
+            );
+        }
     });
 
     async function handleComplete() {
@@ -166,31 +181,35 @@
 <div class="min-h-screen bg-surface text-foreground flex flex-col pb-20">
     <!-- Header -->
     <div
-        class="border-b border-line px-4 py-4 bg-surface sticky top-0 z-20 flex justify-between items-center shadow-sm"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 bg-surface sticky top-0 z-20 flex flex-col shadow-sm"
     >
-        <button
-            onclick={() => history.back()}
-            class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
-        >
-            <ChevronLeft size={24} />
-        </button>
-        <div class="text-center flex-1 px-4 truncate">
-            <h1 class="text-sm font-bold truncate">{recipe?.title}</h1>
-            <p
-                class="text-[10px] text-foreground-muted uppercase tracking-widest font-bold"
+        <div class="flex justify-between items-center w-full">
+            <button
+                onclick={() => history.back()}
+                class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
             >
-                {completedSteps.size} of {recipe?.steps.length || 0} Steps Done
-            </p>
+                <ChevronLeft size={24} />
+            </button>
+            <div class="text-center flex-1 px-4 truncate">
+                <h1 class="text-sm font-bold truncate">{recipe?.title}</h1>
+                <p
+                    class="text-[10px] text-foreground-muted uppercase tracking-widest font-bold"
+                >
+                    {completedSteps.size} of {recipe?.steps.length || 0} Steps Done
+                </p>
+            </div>
+            <div class="w-10"></div>
         </div>
-        <div class="w-10"></div>
-    </div>
 
-    <!-- Progress Bar -->
-    <div class="h-1 bg-surface-sunken w-full sticky top-[65px] z-20">
+        <!-- Progress Bar (Internal) -->
         <div
-            class="h-full bg-accent transition-all duration-500"
-            style="width: {progress}%"
-        ></div>
+            class="h-1 bg-surface-sunken w-full mt-2 rounded-full overflow-hidden"
+        >
+            <div
+                class="h-full bg-accent transition-all duration-500"
+                style="width: {progress}%"
+            ></div>
+        </div>
     </div>
 
     {#if loading}
@@ -433,21 +452,6 @@
                 </div>
             </section>
         </main>
-
-        <!-- Finish Action -->
-        {#if completedSteps.size === recipe.steps.length}
-            <div
-                class="fixed bottom-0 left-0 right-0 p-4 bg-surface/80 backdrop-blur-lg border-t border-line z-30 animate-in slide-in-from-bottom-full duration-500"
-            >
-                <button
-                    onclick={handleComplete}
-                    class="w-full bg-success text-white py-4 rounded-2xl font-bold shadow-lg shadow-success-soft hover:opacity-90 transition flex items-center justify-center gap-2"
-                >
-                    <CheckCircle2 size={20} />
-                    Recipe Completed!
-                </button>
-            </div>
-        {/if}
     {/if}
 </div>
 

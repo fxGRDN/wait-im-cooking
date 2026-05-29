@@ -22,18 +22,11 @@
         Loader2,
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
-    import { open } from "@tauri-apps/plugin-dialog";
-    import {
-        copyFile,
-        mkdir,
-        BaseDirectory,
-        remove,
-    } from "@tauri-apps/plugin-fs";
-    import { appDataDir, join } from "@tauri-apps/api/path";
+    import { remove } from "@tauri-apps/plugin-fs";
+    import { pickAndSaveImages } from "$lib/utils";
     import { goto } from "$app/navigation";
-    import { v4 as uuid } from "uuid";
 
-    const id = $page.params.id;
+    const id = $page.params.id as string;
 
     let log = $state<RecipeHistoryWithImages | null>(null);
     let recipe = $state<Recipe | null>(null);
@@ -51,11 +44,11 @@
         try {
             log = await getCookLog(id);
             if (log) {
-                recipe = await getRecipe(log.history.recipe_id);
-                rating = log.history.rating || 5;
-                notes = log.history.notes || "";
-                servings = log.history.servings_made || 1;
-                duration = log.history.duration_min || 0;
+                recipe = await getRecipe(log.recipe_id);
+                rating = log.rating || 5;
+                notes = log.notes || "";
+                servings = log.servings_made || 1;
+                duration = log.duration_min || 0;
             }
         } catch (e) {
             console.error(e);
@@ -65,45 +58,20 @@
     });
 
     async function pickImages() {
-        const selected = await open({
-            multiple: true,
-            filters: [
-                { name: "Images", extensions: ["png", "jpg", "jpeg", "webp"] },
-            ],
-        });
-        if (Array.isArray(selected)) newImages = [...newImages, ...selected];
-        else if (selected) newImages = [...newImages, selected];
+        const selected = await pickAndSaveImages("history_images");
+        newImages = [...newImages, ...selected];
     }
 
     async function handleSave() {
         if (!log) return;
         saving = true;
         try {
-            const dataDir = await appDataDir();
-            const historyDir = await join(dataDir, "history_images");
-
-            try {
-                await mkdir("history_images", {
-                    baseDir: BaseDirectory.AppData,
-                    recursive: true,
-                });
-            } catch (e) {}
-
-            const processedImages: string[] = [];
-            for (const imgPath of newImages) {
-                const ext = imgPath.split(".").pop();
-                const fileName = `${uuid()}.${ext}`;
-                const targetPath = await join(historyDir, fileName);
-                await copyFile(imgPath, targetPath);
-                processedImages.push(targetPath);
-            }
-
             await updateCookLog(id, {
                 servings_made: servings,
                 duration_min: duration,
                 rating: rating as any,
                 notes: notes,
-                addImagePaths: processedImages,
+                addImagePaths: newImages,
             });
 
             // Refresh data
@@ -146,7 +114,7 @@
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface shadow-sm"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface shadow-sm"
     >
         <div class="flex items-center gap-2">
             <button
@@ -202,7 +170,7 @@
                     class="flex items-center justify-center gap-2 text-sm text-foreground-muted font-medium"
                 >
                     <Calendar size={14} />
-                    {formatDate(log.history.created_at)}
+                    {formatDate(log.created_at)}
                 </div>
             </header>
 

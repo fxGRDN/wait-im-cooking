@@ -26,8 +26,12 @@
         ChefHat,
         Info,
         Tag as TagIcon,
+        Camera,
+        X as XIcon,
     } from "lucide-svelte";
     import QuickAddIngredient from "./QuickAddIngredient.svelte";
+    import { convertFileSrc } from "@tauri-apps/api/core";
+    import { pickAndSaveImage } from "$lib/utils";
 
     let title = $state("");
     let description = $state("");
@@ -35,6 +39,7 @@
     let prepTime = $state<number | null>(null);
     let cookTime = $state<number | null>(null);
     let isFavourite = $state(false);
+    let coverImage = $state<string | null>(null);
 
     let recipeIngredients = $state<RecipeIngredientInput[]>([]);
     let recipeComponents = $state<RecipeComponentInput[]>([]);
@@ -157,17 +162,17 @@
         saving = true;
         error = null;
 
-        const data: RecipeInput = {
-            title: title.trim(),
-            description: description.trim() || null,
-            servings,
-            prep_time: prepTime,
-            cook_time: cookTime,
-            is_favourite: isFavourite,
-            cover_image: null,
-        };
-
         try {
+            const data: RecipeInput = {
+                title: title.trim(),
+                description: description.trim() || null,
+                servings,
+                prep_time: prepTime,
+                cook_time: cookTime,
+                is_favourite: isFavourite,
+                cover_image: coverImage,
+            };
+
             // Filter out empty ingredients/components/steps
             const filteredIngredients = recipeIngredients.filter(
                 (i) => i.ingredient_id !== "",
@@ -194,11 +199,18 @@
             saving = false;
         }
     };
+
+    async function pickCover() {
+        const savedPath = await pickAndSaveImage("recipe_covers");
+        if (savedPath) {
+            coverImage = savedPath;
+        }
+    }
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
     >
         <div class="flex items-center gap-2">
             <a
@@ -239,6 +251,39 @@
             <div
                 class="bg-surface p-4 rounded-xl border border-line space-y-4 shadow-sm"
             >
+                <!-- Image Picker -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Cover Image</label>
+                    {#if coverImage}
+                        <div
+                            class="relative w-full aspect-video rounded-xl overflow-hidden border border-line"
+                        >
+                            <img
+                                src={convertFileSrc(coverImage)}
+                                alt="Cover preview"
+                                class="w-full h-full object-cover"
+                            />
+                            <button
+                                onclick={() => (coverImage = null)}
+                                class="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70 transition"
+                            >
+                                <XIcon size={16} />
+                            </button>
+                        </div>
+                    {:else}
+                        <button
+                            onclick={pickCover}
+                            class="w-full aspect-video rounded-xl border-2 border-dashed border-line flex flex-col items-center justify-center text-foreground-subtle gap-2 hover:bg-surface-raised transition"
+                        >
+                            <Camera size={32} strokeWidth={1.5} />
+                            <span
+                                class="text-xs font-bold uppercase tracking-wider"
+                                >Add Cover Photo</span
+                            >
+                        </button>
+                    {/if}
+                </div>
+
                 <div class="space-y-1">
                     <label for="title" class="text-sm font-medium"
                         >Recipe Title</label

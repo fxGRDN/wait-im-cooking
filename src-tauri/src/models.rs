@@ -223,6 +223,7 @@ pub struct UpdateHistoryInput {
     pub rating: Option<i64>,
     pub notes: Option<String>,
     pub add_image_paths: Vec<String>,
+    pub remove_image_ids: Vec<String>,
 }
 
 // ─────────────────────────────────────────

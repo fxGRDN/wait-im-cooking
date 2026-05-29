@@ -10,24 +10,27 @@
         Clock,
         Image as ImageIcon,
         ChefHat,
+        Edit2,
+        ExternalLink,
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
-    import { redirect } from "@sveltejs/kit";
     import { goto } from "$app/navigation";
+    import EditHistoryModal from "./EditHistoryModal.svelte";
 
     let logs = $state<RecipeHistoryWithImages[]>([]);
     let recipes = $state<Recipe[]>([]);
     let loading = $state(true);
+    let editingLogId = $state<string | null>(null);
+    let isEditModalOpen = $state(false);
 
-    onMount(async () => {
+    async function loadData() {
+        loading = true;
         try {
             const [historyLogs, allRecipes] = await Promise.all([
-                getCookLogs(), // Need to check if this returns images, or if I need getCookLog for each
+                getCookLogs(),
                 getRecipes(),
             ]);
 
-            // For simplicity in the list, we'll fetch full details for logs that have images
-            // In a real app, we might want to optimize this
             const logsWithDetails = await Promise.all(
                 historyLogs.map(async (log) => {
                     const detail = await (
@@ -44,7 +47,9 @@
         } finally {
             loading = false;
         }
-    });
+    }
+
+    onMount(loadData);
 
     function getRecipeTitle(id: string) {
         return recipes.find((r) => r.id === id)?.title || "Unknown Recipe";
@@ -63,15 +68,16 @@
         goto(`/recipes/${id}`);
     }
 
-    function goToRecipeHistory(id: string) {
-        goto(`/recipes/${id}/history`);
+    function openEditModal(id: string) {
+        editingLogId = id;
+        isEditModalOpen = true;
     }
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <!-- Header -->
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex items-center bg-surface"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex items-center bg-surface"
     >
         <button
             onclick={() => history.back()}
@@ -157,9 +163,9 @@
 
                         <div class="p-6 space-y-4">
                             <div class="flex justify-between items-start">
-                                <div>
+                                <div class="flex-1 min-w-0">
                                     <h3
-                                        class="text-lg font-bold text-foreground leading-tight"
+                                        class="text-lg font-bold text-foreground leading-tight truncate"
                                     >
                                         {getRecipeTitle(log.recipe_id)}
                                     </h3>
@@ -172,7 +178,7 @@
                                 </div>
                                 {#if log.rating}
                                     <div
-                                        class="flex items-center gap-1 bg-secondary-soft text-secondary px-2 py-1 rounded-lg"
+                                        class="flex items-center gap-1 bg-secondary-soft text-secondary px-2 py-1 rounded-lg ml-4"
                                     >
                                         <Star size={14} fill="currentColor" />
                                         <span class="font-bold text-sm"
@@ -190,23 +196,43 @@
                                 </p>
                             {/if}
 
-                            <div class="flex items-center gap-4 pt-2">
-                                {#if log.servings_made}
-                                    <div
-                                        class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
+                            <div class="flex items-center justify-between pt-2">
+                                <div class="flex items-center gap-4">
+                                    {#if log.servings_made}
+                                        <div
+                                            class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
+                                        >
+                                            <ChefHat size={14} />
+                                            {log.servings_made} SERVINGS
+                                        </div>
+                                    {/if}
+                                    {#if log.duration_min}
+                                        <div
+                                            class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
+                                        >
+                                            <Clock size={14} />
+                                            {log.duration_min} MIN
+                                        </div>
+                                    {/if}
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        onclick={() =>
+                                            goToRecipe(log.recipe_id)}
+                                        class="p-2 text-foreground-subtle hover:text-accent hover:bg-accent/5 rounded-full transition"
+                                        title="Go to Recipe"
                                     >
-                                        <ChefHat size={14} />
-                                        {log.servings_made} SERVINGS
-                                    </div>
-                                {/if}
-                                {#if log.duration_min}
-                                    <div
-                                        class="flex items-center gap-1.5 text-xs font-bold text-foreground-subtle"
+                                        <ExternalLink size={18} />
+                                    </button>
+                                    <button
+                                        onclick={() => openEditModal(log.id)}
+                                        class="p-2 text-foreground-subtle hover:text-accent hover:bg-accent/5 rounded-full transition"
+                                        title="Edit Cook"
                                     >
-                                        <Clock size={14} />
-                                        {log.duration_min} MIN
-                                    </div>
-                                {/if}
+                                        <Edit2 size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -215,6 +241,14 @@
         {/if}
     </div>
 </div>
+
+{#if editingLogId}
+    <EditHistoryModal
+        bind:open={isEditModalOpen}
+        historyId={editingLogId}
+        onUpdated={loadData}
+    />
+{/if}
 
 <style>
     .no-scrollbar::-webkit-scrollbar {

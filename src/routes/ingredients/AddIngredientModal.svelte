@@ -74,7 +74,7 @@
     <Drawer.Portal>
         <Drawer.Overlay class="fixed inset-0 z-50 bg-black/40" />
         <Drawer.Content
-            class="fixed bottom-0 left-0 right-0 z-50 mt-24 flex h-auto flex-col rounded-t-2xl bg-surface text-foreground shadow-lg border-t border-line outline-none pb-8 pt-4 px-4"
+            class="fixed bottom-0 left-0 right-0 z-50 mt-24 flex h-auto flex-col rounded-t-2xl bg-surface text-foreground shadow-lg border-t border-line outline-none pt-4 px-4 pb-[calc(2rem+env(safe-area-inset-bottom))]"
         >
             <div
                 class="mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full bg-line-strong"

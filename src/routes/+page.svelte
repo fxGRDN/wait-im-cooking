@@ -16,6 +16,7 @@
         History,
         TrendingUp,
     } from "lucide-svelte";
+    import { convertFileSrc } from "@tauri-apps/api/core";
 
     let recentLogs = $state<RecipeHistory[]>([]);
     let lowIngredients = $state<IngredientWithInventory[]>([]);
@@ -47,8 +48,17 @@
         }
     });
 
+    function getRecipe(id: string) {
+        return recipes.find((r) => r.id === id);
+    }
+
     function getRecipeTitle(id: string) {
-        return recipes.find((r) => r.id === id)?.title || "Unknown Recipe";
+        return getRecipe(id)?.title || "Unknown Recipe";
+    }
+
+    function getRecipeImage(id: string) {
+        const r = getRecipe(id);
+        return r?.cover_image ? convertFileSrc(r.cover_image) : null;
     }
 
     function formatDate(dateStr: string) {
@@ -62,7 +72,9 @@
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <!-- Header -->
-    <div class="px-4 py-6 border-b border-line bg-surface sticky top-0 z-10">
+    <div
+        class="px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-6 border-b border-line bg-surface sticky top-0 z-10"
+    >
         <div class="flex items-center gap-3">
             <div
                 class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-background shadow-lg shadow-accent/20"

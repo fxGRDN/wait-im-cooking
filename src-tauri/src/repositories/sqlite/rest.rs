@@ -169,7 +169,7 @@ r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, cr
         Ok(id)
     }
 
-    async fn update(&self, id: &str, input: UpdateHistoryInput) -> RepoResult<()> {
+    async fn update(&self, id: &str, input: UpdateHistoryInput) -> RepoResult<Vec<String>> {
         let now = chrono::Utc::now().to_rfc3339();
         let mut tx = self.pool.begin().await.map_err(|e| e.to_string())?;
 
@@ -180,6 +180,26 @@ r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, cr
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
+
+        let mut deleted_paths = Vec::new();
+
+        for img_id in &input.remove_image_ids {
+            let row = sqlx::query!(
+                "SELECT file_path FROM recipe_history_images WHERE id = ?",
+                img_id
+            )
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+
+            if let Some(r) = row {
+                deleted_paths.push(r.file_path);
+                sqlx::query!("DELETE FROM recipe_history_images WHERE id = ?", img_id)
+                    .execute(&mut *tx)
+                    .await
+                    .map_err(|e| e.to_string())?;
+            }
+        }
 
         for path in &input.add_image_paths {
             let img_id = Uuid::new_v4().to_string();
@@ -193,7 +213,7 @@ r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, cr
         }
 
         tx.commit().await.map_err(|e| e.to_string())?;
-        Ok(())
+        Ok(deleted_paths)
     }
 
     // returns file paths — caller removes files from disk

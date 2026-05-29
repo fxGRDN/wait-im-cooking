@@ -35,7 +35,7 @@ async fn init_db(app: &tauri::App) -> SqlitePool {
 
     let db_path = app_dir.join("recipes.db");
 
-    println!("{}", db_path.display()); // add temporarily in init_db
+    log::info!("Database path: {}", db_path.display());
     let options = SqliteConnectOptions::from_str(&format!("sqlite:{}", db_path.display()))
         .unwrap()
         .create_if_missing(true)
@@ -59,6 +59,7 @@ async fn init_db(app: &tauri::App) -> SqlitePool {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
@@ -110,6 +111,7 @@ pub fn run() {
             commands::delete_cook_log,
             // pantry
             commands::check_availability,
+            commands::save_image,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,11 @@
 <script lang="ts">
     import { theme, setTheme } from "$lib/stores/theme";
     import {
+        settings,
+        updateFontScale,
+        updateLeftHandedMode,
+    } from "$lib/stores/settings";
+    import {
         ChevronLeft,
         Moon,
         Sun,
@@ -8,35 +13,28 @@
         Palette,
         Info,
         ChefHat,
+        Hand,
     } from "lucide-svelte";
     import { onMount } from "svelte";
 
-    let fontSize = $state(16);
+    let fontSizePercent = $state(100);
 
     onMount(() => {
-        const storedFontSize = localStorage.getItem(
-            "wait-im-cooking-font-size",
-        );
-        if (storedFontSize) {
-            fontSize = parseInt(storedFontSize);
-            applyFontSize(fontSize);
-        }
+        const unsubscribe = settings.subscribe((value) => {
+            fontSizePercent = value.fontScale;
+        });
+        return unsubscribe;
     });
 
-    function applyFontSize(size: number) {
-        document.documentElement.style.fontSize = `${size}px`;
-        localStorage.setItem("wait-im-cooking-font-size", size.toString());
-    }
-
     $effect(() => {
-        applyFontSize(fontSize);
+        updateFontScale(fontSizePercent);
     });
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <!-- Header -->
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex items-center bg-surface"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex items-center bg-surface"
     >
         <button
             onclick={() => history.back()}
@@ -81,6 +79,7 @@
                     </div>
 
                     <button
+                        aria-label="Toggle dark mode"
                         onclick={() =>
                             setTheme($theme === "dark" ? "light" : "dark")}
                         class="w-12 h-6 rounded-full relative transition-colors duration-200 focus:outline-none {$theme ===
@@ -91,6 +90,37 @@
                         <div
                             class="absolute top-1 left-1 w-4 h-4 rounded-full bg-background transition-transform duration-200 {$theme ===
                             'dark'
+                                ? 'translate-x-6'
+                                : ''}"
+                        ></div>
+                    </button>
+                </div>
+
+                <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-surface-sunken flex items-center justify-center text-foreground-muted"
+                        >
+                            <Hand size={20} />
+                        </div>
+                        <div>
+                            <p class="font-bold">Left-handed Mode</p>
+                            <p class="text-xs text-foreground-muted">
+                                Move action buttons to the left side
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        aria-label="Toggle left-handed mode"
+                        onclick={() =>
+                            updateLeftHandedMode(!$settings.leftHandedMode)}
+                        class="w-12 h-6 rounded-full relative transition-colors duration-200 focus:outline-none {$settings.leftHandedMode
+                            ? 'bg-accent'
+                            : 'bg-line'}"
+                    >
+                        <div
+                            class="absolute top-1 left-1 w-4 h-4 rounded-full bg-background transition-transform duration-200 {$settings.leftHandedMode
                                 ? 'translate-x-6'
                                 : ''}"
                         ></div>
@@ -108,27 +138,29 @@
                         <div>
                             <p class="font-bold">Text Size</p>
                             <p class="text-xs text-foreground-muted">
-                                Adjust the application font size
+                                Scale application text size
                             </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4 px-2">
-                        <span class="text-xs text-foreground-subtle">A</span>
+                        <span class="text-xs text-foreground-subtle">80%</span>
                         <input
                             type="range"
-                            min="12"
-                            max="24"
-                            step="1"
-                            bind:value={fontSize}
+                            min="80"
+                            max="150"
+                            step="5"
+                            bind:value={fontSizePercent}
                             class="flex-1 accent-accent h-1.5 bg-surface-sunken rounded-lg appearance-none cursor-pointer"
                         />
-                        <span class="text-lg text-foreground font-bold">A</span>
+                        <span class="text-lg text-foreground font-bold"
+                            >150%</span
+                        >
                     </div>
                     <p
                         class="text-center text-xs text-foreground-subtle font-medium"
                     >
-                        {fontSize}px
+                        {fontSizePercent}%
                     </p>
                 </div>
             </div>

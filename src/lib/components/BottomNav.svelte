@@ -1,7 +1,16 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { page } from "$app/state";
     import { resolve } from "$app/paths";
-    import { House, Carrot, ChefHat, Settings } from "@lucide/svelte";
+    import {
+        House,
+        Carrot,
+        ChefHat,
+        Settings,
+        Plus,
+        CheckCircle2,
+    } from "@lucide/svelte";
+    import { settings } from "$lib/stores/settings";
 
     const path = $derived(page.url.pathname);
 
@@ -22,6 +31,28 @@
         path === settingsPath || path.startsWith(settingsPath + "/"),
     );
 
+    // FAB State - relative to nav
+    const showAddIngredient = $derived(path === ingredientsPath);
+    const showAddRecipe = $derived(path === recipesPath);
+    const showStartCooking = $derived(
+        path.startsWith(recipesPath + "/") &&
+            !path.endsWith("/cook") &&
+            path.split("/").length === 3,
+    );
+
+    let isCookCompleted = $state(false);
+    const showCompleteCooking = $derived(
+        path.endsWith("/cook") && isCookCompleted,
+    );
+
+    onMount(() => {
+        const handleStatus = (e: any) => {
+            isCookCompleted = e.detail?.completed || false;
+        };
+        window.addEventListener("cook-status", handleStatus);
+        return () => window.removeEventListener("cook-status", handleStatus);
+    });
+
     const tabBase =
         "flex flex-col items-center gap-1 py-2 text-xs transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent-focus-ring rounded-lg mx-2 my-1";
     const tabActive = "text-accent bg-accent/10";
@@ -30,30 +61,67 @@
 </script>
 
 <nav
-    class="sticky bottom-0 border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]"
+    class="sticky bottom-0 border-t border-line bg-surface/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] z-50"
     aria-label="Primary"
 >
-    <ul class="mx-auto grid max-w-md grid-cols-4 gap-1 px-2 py-1">
-        <li class="contents">
-            <a
-                href={ingredientsPath}
-                class="{tabBase} {onIngredients ? tabActive : tabIdle}"
-                aria-current={onIngredients ? "page" : undefined}
-            >
-                <div
-                    class="relative flex items-center justify-center h-7 w-7 mb-0.5 transition-transform duration-300 {onIngredients
-                        ? 'scale-110'
-                        : ''}"
+    <!-- Relative FAB Container -->
+    <div
+        class="absolute bottom-[calc(100%+1rem)] left-0 right-0 pointer-events-none"
+    >
+        <div class="max-w-2xl mx-auto relative h-14">
+            {#if showAddIngredient}
+                <button
+                    type="button"
+                    onclick={() =>
+                        window.dispatchEvent(
+                            new CustomEvent("open-add-ingredient"),
+                        )}
+                    class="absolute w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition pointer-events-auto {$settings.leftHandedMode
+                        ? 'left-6'
+                        : 'right-6'}"
+                    aria-label="Add to Inventory"
                 >
-                    <Carrot
-                        class="h-5 w-5 transition-all duration-300 {onIngredients
-                            ? 'stroke-[2.5px]'
-                            : 'stroke-2'}"
-                    />
-                </div>
-                <span class="font-semibold">Inventory</span>
-            </a>
-        </li>
+                    <Plus size={28} strokeWidth={2.5} />
+                </button>
+            {:else if showAddRecipe}
+                <a
+                    href="/recipes/add"
+                    class="absolute w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition pointer-events-auto {$settings.leftHandedMode
+                        ? 'left-6'
+                        : 'right-6'}"
+                    aria-label="Add Recipe"
+                >
+                    <Plus size={28} strokeWidth={2.5} />
+                </a>
+            {:else if showStartCooking}
+                <button
+                    onclick={() =>
+                        window.dispatchEvent(new CustomEvent("start-cooking"))}
+                    class="absolute bg-accent text-background px-6 py-4 rounded-2xl font-bold shadow-xl shadow-accent/20 flex items-center gap-2 hover:scale-105 transition active:scale-95 pointer-events-auto {$settings.leftHandedMode
+                        ? 'left-6'
+                        : 'right-6'}"
+                >
+                    <ChefHat size={20} fill="currentColor" />
+                    Start Cooking
+                </button>
+            {:else if showCompleteCooking}
+                <button
+                    onclick={() =>
+                        window.dispatchEvent(
+                            new CustomEvent("complete-cooking"),
+                        )}
+                    class="absolute bg-success text-white px-6 py-4 rounded-2xl font-bold shadow-xl shadow-success/20 flex items-center gap-2 hover:scale-105 transition active:scale-95 pointer-events-auto {$settings.leftHandedMode
+                        ? 'left-6'
+                        : 'right-6'}"
+                >
+                    <CheckCircle2 size={20} />
+                    Complete
+                </button>
+            {/if}
+        </div>
+    </div>
+
+    <ul class="mx-auto grid max-w-md grid-cols-4 gap-1 px-2 py-1">
         <li class="contents">
             <a
                 href={homeHref}
@@ -72,6 +140,26 @@
                     />
                 </div>
                 <span class="font-semibold">Home</span>
+            </a>
+        </li>
+        <li class="contents">
+            <a
+                href={ingredientsPath}
+                class="{tabBase} {onIngredients ? tabActive : tabIdle}"
+                aria-current={onIngredients ? "page" : undefined}
+            >
+                <div
+                    class="relative flex items-center justify-center h-7 w-7 mb-0.5 transition-transform duration-300 {onIngredients
+                        ? 'scale-110'
+                        : ''}"
+                >
+                    <Carrot
+                        class="h-5 w-5 transition-all duration-300 {onIngredients
+                            ? 'stroke-[2.5px]'
+                            : 'stroke-2'}"
+                    />
+                </div>
+                <span class="font-semibold">Inventory</span>
             </a>
         </li>
         <li class="contents">

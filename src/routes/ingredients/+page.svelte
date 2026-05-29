@@ -3,6 +3,8 @@
     import { getInventory } from "$lib/services/ingredients";
     import type { IngredientWithInventory } from "$lib/types";
     import AddIngredientModal from "./AddIngredientModal.svelte";
+    import { Plus } from "lucide-svelte";
+    import { settings } from "$lib/stores/settings";
 
     let ingredients: IngredientWithInventory[] = $state([]);
     let loading = $state(true);
@@ -21,36 +23,23 @@
     const handleAdd = async () => {
         ingredients = await getInventory();
     };
+
+    onMount(() => {
+        window.addEventListener("open-add-ingredient", () => (addOpen = true));
+        return () =>
+            window.removeEventListener(
+                "open-add-ingredient",
+                () => (addOpen = true),
+            );
+    });
 </script>
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
     >
         <h1 class="text-2xl font-bold">Inventory</h1>
     </div>
-
-    <button
-        type="button"
-        onclick={() => (addOpen = true)}
-        class="fixed bottom-24 right-6 w-14 h-14 bg-accent text-background rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition z-40"
-        aria-label="Add to Inventory"
-    >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-    </button>
 
     <div class="px-4 max-w-md mx-auto">
         {#if loading}

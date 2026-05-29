@@ -21,6 +21,9 @@
         Play,
     } from "lucide-svelte";
 
+    import { convertFileSrc } from "@tauri-apps/api/core";
+    import { settings } from "$lib/stores/settings";
+
     let recipe = $state<RecipeWithTree | null>(null);
     let loading = $state(true);
     let error = $state<string | null>(null);
@@ -65,6 +68,11 @@
         goto(`/recipes/${id}/cook`);
     };
 
+    onMount(() => {
+        window.addEventListener("start-cooking", startCooking);
+        return () => window.removeEventListener("start-cooking", startCooking);
+    });
+
     function formatTime(minutes: number | null) {
         if (!minutes) return null;
         if (minutes < 60) return `${minutes}m`;
@@ -76,7 +84,7 @@
 
 <div class="min-h-screen bg-surface text-foreground pb-20">
     <div
-        class="border-b border-line px-4 py-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
+        class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
     >
         <div class="flex items-center gap-2">
             <a
@@ -124,20 +132,12 @@
             >
         </div>
     {:else if recipe}
-        <button
-            onclick={startCooking}
-            class="fixed bottom-24 right-6 bg-accent text-background px-6 py-4 rounded-2xl font-bold shadow-xl shadow-accent/20 flex items-center gap-2 hover:scale-105 transition active:scale-95 z-40"
-        >
-            <Play size={20} fill="currentColor" />
-            Start Cooking
-        </button>
-
         <div class="px-4 max-w-2xl mx-auto space-y-8">
             <!-- Header/Meta -->
             <section class="space-y-4">
                 {#if recipe.cover_image}
                     <img
-                        src={recipe.cover_image}
+                        src={convertFileSrc(recipe.cover_image)}
                         alt={recipe.title}
                         class="w-full h-48 sm:h-64 object-cover rounded-2xl shadow-sm border border-line"
                     />
