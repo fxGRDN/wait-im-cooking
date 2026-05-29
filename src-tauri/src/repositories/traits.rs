@@ -51,6 +51,7 @@ pub trait TagRepository: Send + Sync {
     async fn find_all(&self) -> RepoResult<Vec<Tag>>;
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Tag>>;
     async fn create(&self, name: &str) -> RepoResult<Tag>;
+    async fn update(&self, id: &str, name: &str) -> RepoResult<()>;
     async fn delete(&self, id: &str) -> RepoResult<()>;
 }
 

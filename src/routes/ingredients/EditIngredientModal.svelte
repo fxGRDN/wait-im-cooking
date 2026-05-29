@@ -1,35 +1,44 @@
 <script lang="ts">
     import { Drawer } from "vaul-svelte";
     import {
-        getOrCreateIngredient,
+        updateIngredient,
         upsertInventory,
+        deleteIngredient,
     } from "$lib/services/ingredients";
     import { COMMON_UNITS } from "$lib/utils";
+    import type { IngredientWithInventory } from "$lib/types";
+    import { Trash2, Save, Loader2 } from "lucide-svelte";
 
     let {
         open = $bindable(false),
-        onAdd,
-    }: { open: boolean; onAdd: () => void } = $props();
+        ingredient,
+        onUpdated,
+    }: {
+        open: boolean;
+        ingredient: IngredientWithInventory | null;
+        onUpdated: () => void;
+    } = $props();
 
     let name = $state("");
     let quantity = $state<number | "">("");
     let unit = $state(COMMON_UNITS[0]);
     let threshold = $state<number | "">("");
     let saving = $state(false);
+    let deleting = $state(false);
     let error = $state<string | null>(null);
-    let inputRef = $state<HTMLInputElement | null>(null);
 
     $effect(() => {
-        if (open) {
-            name = "";
-            quantity = "";
-            unit = COMMON_UNITS[0];
-            threshold = "";
+        if (open && ingredient) {
+            name = ingredient.name;
+            quantity = ingredient.inventory?.quantity ?? "";
+            unit = ingredient.inventory?.unit ?? ingredient.default_unit ?? COMMON_UNITS[0];
+            threshold = ingredient.restock_threshold ?? "";
             error = null;
         }
     });
 
     const submit = async () => {
+        if (!ingredient) return;
         const trimmedName = name.trim();
         const numQuantity = Number(quantity);
         const numThreshold = threshold === "" ? null : Number(threshold);
@@ -39,35 +48,45 @@
             return;
         }
 
-        if (!quantity || isNaN(numQuantity) || numQuantity < 0) {
-            error = "Valid quantity is required.";
-            return;
-        }
-
         saving = true;
         error = null;
 
         try {
-            const created = await getOrCreateIngredient(
-                trimmedName,
-                unit || null,
-                numThreshold,
-            );
-            await upsertInventory(created.id, numQuantity, unit);
-            onAdd();
-            // Clear fields to allow adding another
-            name = "";
-            quantity = "";
-            threshold = "";
-            // Focus back on the first input
-            if (inputRef) {
-                inputRef.focus();
+            // Update global ingredient properties
+            await updateIngredient(ingredient.id, {
+                name: trimmedName,
+                default_unit: unit,
+                restock_threshold: numThreshold,
+            });
+
+            // Update specific inventory quantity if provided
+            if (quantity !== "" && !isNaN(numQuantity)) {
+                await upsertInventory(ingredient.id, numQuantity, unit);
             }
+
+            onUpdated();
+            open = false;
         } catch (e) {
             console.error(e);
-            error = "Failed to add to inventory.";
+            error = "Failed to update ingredient.";
         } finally {
             saving = false;
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!ingredient || !confirm(`Delete "${ingredient.name}" from library? This cannot be undone.`)) return;
+
+        deleting = true;
+        try {
+            await deleteIngredient(ingredient.id);
+            onUpdated();
+            open = false;
+        } catch (e) {
+            console.error(e);
+            error = "Failed to delete ingredient. It might be used in recipes.";
+        } finally {
+            deleting = false;
         }
     };
 </script>
@@ -91,27 +110,32 @@
             >
                 <div class="flex items-center justify-between">
                     <Drawer.Title class="text-lg font-semibold"
-                        >Add to Inventory</Drawer.Title
+                        >Edit Ingredient</Drawer.Title
                     >
+                    <button
+                        type="button"
+                        onclick={handleDelete}
+                        disabled={deleting || saving}
+                        class="p-2 text-foreground-subtle hover:text-danger transition"
+                    >
+                        {#if deleting}
+                            <Loader2 size={20} class="animate-spin" />
+                        {:else}
+                            <Trash2 size={20} />
+                        {/if}
+                    </button>
                 </div>
-                <Drawer.Description class="sr-only"
-                    >Add a new ingredient to your inventory. This dialog allows
-                    adding multiple items without closing.</Drawer.Description
-                >
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium" for="ingredient-name"
+                    <label class="text-sm font-medium" for="edit-ingredient-name"
                         >Name</label
                     >
                     <input
-                        id="ingredient-name"
-                        bind:this={inputRef}
+                        id="edit-ingredient-name"
                         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                         type="text"
                         bind:value={name}
-                        autocomplete="off"
-                        autocapitalize="words"
-                        disabled={saving}
+                        disabled={saving || deleting}
                         required
                     />
                 </div>
@@ -120,28 +144,27 @@
                     <div class="space-y-2">
                         <label
                             class="text-sm font-medium"
-                            for="ingredient-quantity">Quantity</label
+                            for="edit-ingredient-quantity">Quantity</label
                         >
                         <input
-                            id="ingredient-quantity"
+                            id="edit-ingredient-quantity"
                             class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                             type="number"
                             step="any"
                             min="0"
                             bind:value={quantity}
-                            disabled={saving}
-                            required
+                            disabled={saving || deleting}
                         />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-medium" for="ingredient-unit"
+                        <label class="text-sm font-medium" for="edit-ingredient-unit"
                             >Unit</label
                         >
                         <select
-                            id="ingredient-unit"
+                            id="edit-ingredient-unit"
                             class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                             bind:value={unit}
-                            disabled={saving}
+                            disabled={saving || deleting}
                         >
                             {#each COMMON_UNITS as u}
                                 <option value={u}>{u}</option>
@@ -153,41 +176,43 @@
                 <div class="space-y-2">
                     <label
                         class="text-sm font-medium"
-                        for="ingredient-threshold"
-                        >Restock Threshold (Optional)</label
+                        for="edit-ingredient-threshold"
+                        >Restock Threshold</label
                     >
                     <input
-                        id="ingredient-threshold"
+                        id="edit-ingredient-threshold"
                         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
                         type="number"
                         step="any"
                         min="0"
-                        placeholder="Notify when below..."
+                        placeholder="None"
                         bind:value={threshold}
-                        disabled={saving}
+                        disabled={saving || deleting}
                     />
-                    <p
-                        class="text-[10px] text-foreground-subtle uppercase tracking-widest font-bold"
-                    >
-                        Items will only be displayed in inventory if below this
-                        amount.
-                    </p>
                 </div>
 
                 {#if error}
                     <p class="text-sm text-danger">{error}</p>
                 {/if}
+
                 <div class="flex justify-end gap-2 mt-4">
                     <Drawer.Close
                         class="px-3 py-2 text-sm rounded-lg border border-line bg-surface hover:bg-surface-raised transition"
-                        disabled={saving}>Done</Drawer.Close
+                        disabled={saving || deleting}>Cancel</Drawer.Close
                     >
                     <button
                         type="submit"
-                        class="px-3 py-2 text-sm rounded-lg bg-accent text-background disabled:opacity-60 hover:opacity-90 transition"
-                        disabled={saving || !name.trim() || !quantity}
-                        >{saving ? "Saving..." : "Add"}</button
+                        class="px-3 py-2 text-sm rounded-lg bg-accent text-background disabled:opacity-60 hover:opacity-90 transition font-bold flex items-center gap-2"
+                        disabled={saving || deleting || !name.trim()}
                     >
+                        {#if saving}
+                            <Loader2 size={16} class="animate-spin" />
+                            Saving...
+                        {:else}
+                            <Save size={16} />
+                            Save Changes
+                        {/if}
+                    </button>
                 </div>
             </form>
         </Drawer.Content>

@@ -20,7 +20,7 @@ impl IngredientRepository for SqliteIngredientRepository {
     async fn find_all(&self) -> RepoResult<Vec<Ingredient>> {
         sqlx::query_as!(
             Ingredient,
-            r#"SELECT id as "id!", name, default_unit FROM ingredients ORDER BY name ASC"#
+            r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients ORDER BY name ASC"#
         )
         .fetch_all(&self.pool)
         .await
@@ -34,6 +34,7 @@ impl IngredientRepository for SqliteIngredientRepository {
                 i.id as "id!",
                 i.name,
                 i.default_unit,
+                i.restock_threshold,
                 ii.id         AS inv_id,
                 ii.quantity   AS inv_quantity,
                 ii.unit       AS inv_unit,
@@ -55,6 +56,7 @@ impl IngredientRepository for SqliteIngredientRepository {
                     id: id.clone(),
                     name: r.name,
                     default_unit: r.default_unit,
+                    restock_threshold: r.restock_threshold,
                     inventory: Some(IngredientInventory {
                         id: r.inv_id.expect("IngridientInventory id is missing!"),
                         ingredient_id: id,
@@ -70,7 +72,7 @@ impl IngredientRepository for SqliteIngredientRepository {
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Ingredient>> {
         sqlx::query_as!(
             Ingredient,
-            r#"SELECT id as "id!", name, default_unit FROM ingredients WHERE id = ?"#,
+            r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients WHERE id = ?"#,
             id
         )
         .fetch_optional(&self.pool)
@@ -85,6 +87,7 @@ impl IngredientRepository for SqliteIngredientRepository {
                 i.id as "id!",
                 i.name,
                 i.default_unit,
+                i.restock_threshold,
                 ii.id         AS inv_id,
                 ii.quantity   AS inv_quantity,
                 ii.unit       AS inv_unit,
@@ -105,6 +108,7 @@ impl IngredientRepository for SqliteIngredientRepository {
                 id: id.clone(),
                 name: r.name,
                 default_unit: r.default_unit,
+                restock_threshold: r.restock_threshold,
                 inventory: r.inv_id.map(|inv_id| IngredientInventory {
                     id: inv_id,
                     ingredient_id: id.clone(),
@@ -120,7 +124,7 @@ impl IngredientRepository for SqliteIngredientRepository {
         let pattern = format!("%{}%", query);
         sqlx::query_as!(
             Ingredient,
-            r#"SELECT id as "id!", name, default_unit FROM ingredients WHERE name LIKE ? ORDER BY name ASC"#,
+            r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients WHERE name LIKE ? ORDER BY name ASC"#,
             pattern
         )
         .fetch_all(&self.pool)
@@ -131,10 +135,11 @@ impl IngredientRepository for SqliteIngredientRepository {
     async fn create(&self, input: CreateIngredientInput) -> RepoResult<Ingredient> {
         let id = Uuid::new_v4().to_string();
         sqlx::query!(
-            "INSERT INTO ingredients (id, name, default_unit) VALUES (?, ?, ?)",
+            "INSERT INTO ingredients (id, name, default_unit, restock_threshold) VALUES (?, ?, ?, ?)",
             id,
             input.name,
-            input.default_unit
+            input.default_unit,
+            input.restock_threshold
         )
         .execute(&self.pool)
         .await
@@ -144,6 +149,7 @@ impl IngredientRepository for SqliteIngredientRepository {
             id,
             name: input.name,
             default_unit: input.default_unit,
+            restock_threshold: input.restock_threshold,
         })
     }
 
@@ -159,6 +165,16 @@ impl IngredientRepository for SqliteIngredientRepository {
             sqlx::query!(
                 "UPDATE ingredients SET default_unit = ? WHERE id = ?",
                 unit,
+                id
+            )
+            .execute(&self.pool)
+            .await
+            .map_err(|e| e.to_string())?;
+        }
+        if let Some(threshold) = input.restock_threshold {
+            sqlx::query!(
+                "UPDATE ingredients SET restock_threshold = ? WHERE id = ?",
+                threshold,
                 id
             )
             .execute(&self.pool)

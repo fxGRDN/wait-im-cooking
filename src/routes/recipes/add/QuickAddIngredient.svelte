@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Drawer } from "vaul-svelte";
     import { createIngredient } from "$lib/services/ingredients";
+    import { COMMON_UNITS } from "$lib/utils";
 
     let {
         open = $bindable(false),
@@ -13,14 +14,14 @@
     } = $props();
 
     let name = $state(initialName);
-    let defaultUnit = $state("");
+    let defaultUnit = $state(COMMON_UNITS[0]);
     let saving = $state(false);
     let error = $state<string | null>(null);
 
     $effect(() => {
         if (open) {
             name = initialName;
-            defaultUnit = "";
+            defaultUnit = COMMON_UNITS[0];
             error = null;
         }
     });
@@ -38,7 +39,7 @@
         try {
             const created = await createIngredient(
                 trimmedName,
-                defaultUnit.trim() || null,
+                defaultUnit || null,
             );
             onCreated(created);
             open = false;
@@ -91,16 +92,18 @@
 
                 <div class="space-y-2">
                     <label class="text-sm font-medium" for="new-ingredient-unit"
-                        >Default Unit (optional)</label
+                        >Default Unit</label
                     >
-                    <input
+                    <select
                         id="new-ingredient-unit"
                         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm"
-                        type="text"
                         bind:value={defaultUnit}
-                        placeholder="e.g. g, ml, pcs"
                         disabled={saving}
-                    />
+                    >
+                        {#each COMMON_UNITS as u}
+                            <option value={u}>{u}</option>
+                        {/each}
+                    </select>
                 </div>
 
                 {#if error}

@@ -28,6 +28,7 @@
     import { remove } from "@tauri-apps/plugin-fs";
     import { saveImages } from "$lib/utils";
     import { goto } from "$app/navigation";
+    import ImageModal from "$lib/components/ImageModal.svelte";
 
     const id = $page.params.id as string;
 
@@ -46,6 +47,8 @@
     let duration = $state(0);
     let newImages = $state<string[]>([]);
     let imagesToRemove = $state<string[]>([]);
+
+    let previewImage = $state<string | null>(null);
 
     onMount(async () => {
         try {
@@ -262,13 +265,22 @@
                         <div
                             class="relative flex-shrink-0 w-48 aspect-square rounded-3xl border border-line overflow-hidden shadow-sm"
                         >
+                            <!-- svelte-ignore a11y_click_events_have_key_events -->
+                            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                             <img
                                 src={convertFileSrc(img.file_path)}
                                 alt="Dish"
                                 class="w-full h-full object-cover {isEditing &&
                                 imagesToRemove.includes(img.id)
                                     ? 'opacity-30 grayscale'
+                                    : ''} {!isEditing
+                                    ? 'cursor-zoom-in active:scale-[0.98] transition'
                                     : ''}"
+                                onclick={() =>
+                                    !isEditing &&
+                                    (previewImage = convertFileSrc(
+                                        img.file_path,
+                                    ))}
                             />
                             {#if isEditing}
                                 <button
@@ -441,6 +453,12 @@
         </main>
     {/if}
 </div>
+
+<ImageModal
+    src={previewImage}
+    alt="History detail"
+    onClose={() => (previewImage = null)}
+/>
 
 <style>
     .no-scrollbar::-webkit-scrollbar {

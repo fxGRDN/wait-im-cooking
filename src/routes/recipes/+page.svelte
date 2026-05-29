@@ -10,6 +10,7 @@
         Filter,
         X,
         Plus,
+        History,
     } from "lucide-svelte";
     import { invoke, convertFileSrc } from "@tauri-apps/api/core";
     import { settings } from "$lib/stores/settings";
@@ -80,14 +81,27 @@
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Recipes</h1>
             <div class="flex gap-2">
+                <a
+                    href="/recipes/history"
+                    class="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-sunken border border-line hover:bg-surface-raised transition text-foreground-muted hover:text-accent group"
+                    title="View Cooking Log"
+                >
+                    <History
+                        size={18}
+                        class="group-hover:scale-110 transition-transform"
+                    />
+                    <span class="text-xs font-bold uppercase tracking-wider"
+                        >Log</span
+                    >
+                </a>
                 <button
                     onclick={() => (showFilters = !showFilters)}
-                    class="p-2 rounded-lg border border-line hover:bg-surface-raised transition {selectedTagIds.length >
+                    class="p-2 rounded-xl border border-line hover:bg-surface-raised transition {selectedTagIds.length >
                     0
                         ? 'bg-accent/10 border-accent text-accent'
-                        : ''}"
+                        : 'text-foreground-muted'}"
                 >
-                    <Filter size={20} />
+                    <Filter size={18} />
                 </button>
             </div>
         </div>
@@ -175,44 +189,48 @@
                 {#each filteredRecipes as recipe}
                     <a
                         href="/recipes/{recipe.id}"
-                        class="bg-surface rounded-xl shadow-sm border border-line overflow-hidden hover:border-accent/50 transition flex group"
+                        class="bg-surface rounded-2xl border border-line shadow-sm overflow-hidden hover:border-accent/50 transition-all flex group h-28 sm:h-32"
                     >
                         {#if recipe.cover_image}
                             <div
-                                class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0"
+                                class="w-28 h-full sm:w-32 flex-shrink-0 overflow-hidden"
                             >
                                 <img
                                     src={convertFileSrc(recipe.cover_image)}
                                     alt={recipe.title}
-                                    class="w-full h-full object-cover"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 />
                             </div>
                         {:else}
                             <div
-                                class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
+                                class="w-28 h-full sm:w-32 flex-shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
                             >
-                                <ChefHat size={32} />
+                                <ChefHat size={32} strokeWidth={1.5} />
                             </div>
                         {/if}
 
-                        <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div
+                            class="p-3 sm:p-4 flex-1 flex flex-col justify-between min-w-0"
+                        >
                             <div>
-                                <div class="flex justify-between items-start">
+                                <div
+                                    class="flex justify-between items-start gap-2"
+                                >
                                     <h2
-                                        class="text-lg font-bold group-hover:text-accent transition line-clamp-1"
+                                        class="text-sm sm:text-base font-bold group-hover:text-accent transition truncate"
                                     >
                                         {recipe.title}
                                     </h2>
                                     {#if recipe.is_favourite}
                                         <Heart
                                             size={16}
-                                            class="text-danger fill-current"
+                                            class="text-danger fill-current shrink-0"
                                         />
                                     {/if}
                                 </div>
                                 {#if recipe.description}
                                     <p
-                                        class="text-sm text-foreground-muted line-clamp-1 mt-1"
+                                        class="text-xs text-foreground-muted line-clamp-2 mt-0.5 leading-snug"
                                     >
                                         {recipe.description}
                                     </p>
@@ -220,18 +238,18 @@
                             </div>
 
                             <div
-                                class="flex items-center gap-4 mt-2 text-xs text-foreground-muted font-medium"
+                                class="flex items-center gap-3 text-[10px] sm:text-xs font-bold text-foreground-subtle uppercase tracking-wider"
                             >
                                 {#if recipe.prep_time}
                                     <span class="flex items-center gap-1">
                                         <Clock size={12} />
-                                        Prep: {formatTime(recipe.prep_time)}
+                                        {formatTime(recipe.prep_time)}
                                     </span>
                                 {/if}
                                 {#if recipe.cook_time}
                                     <span class="flex items-center gap-1">
                                         <ChefHat size={12} />
-                                        Cook: {formatTime(recipe.cook_time)}
+                                        {formatTime(recipe.cook_time)}
                                     </span>
                                 {/if}
                             </div>

@@ -58,6 +58,14 @@ impl TagRepository for SqliteTagRepository {
         })
     }
 
+    async fn update(&self, id: &str, name: &str) -> RepoResult<()> {
+        sqlx::query!("UPDATE tags SET name = ? WHERE id = ?", name, id)
+            .execute(&self.pool)
+            .await
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
     async fn delete(&self, id: &str) -> RepoResult<()> {
         // recipe_tags cascade automatically
         sqlx::query!("DELETE FROM tags WHERE id = ?", id)

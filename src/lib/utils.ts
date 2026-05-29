@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
 import { open } from "@tauri-apps/plugin-dialog";
 import { appDataDir, join } from "@tauri-apps/api/path";
+export const COMMON_UNITS = ["g", "kg", "ml", "l", "pcs"] as const;
 
 export const saveImages = async (
   folder: string,

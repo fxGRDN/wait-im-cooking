@@ -102,6 +102,7 @@ pub fn run() {
             // tags
             commands::get_tags,
             commands::create_tag,
+            commands::update_tag,
             commands::delete_tag,
             // history
             commands::get_cook_logs,

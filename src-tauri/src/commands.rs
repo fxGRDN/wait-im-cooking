@@ -151,6 +151,11 @@ pub async fn create_tag(name: String, state: State<'_, AppState>) -> Result<Tag,
 }
 
 #[tauri::command]
+pub async fn update_tag(id: String, name: String, state: State<'_, AppState>) -> Result<(), String> {
+    state.tags.update(&id, &name).await
+}
+
+#[tauri::command]
 pub async fn delete_tag(id: String, state: State<'_, AppState>) -> Result<(), String> {
     state.tags.delete(&id).await
 }

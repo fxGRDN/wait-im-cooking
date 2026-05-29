@@ -31,7 +31,7 @@
     } from "lucide-svelte";
     import QuickAddIngredient from "./QuickAddIngredient.svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
-    import { saveImages } from "$lib/utils";
+    import { saveImages, COMMON_UNITS } from "$lib/utils";
 
     let title = $state("");
     let description = $state("");
@@ -108,13 +108,22 @@
         activeIngredientIndex = null;
     };
 
-    const addStep = () => {
-        recipeSteps.push({
-            step_order: recipeSteps.length + 1,
-            step_type: "cook",
+    const addStep = (index?: number) => {
+        const newStep = {
+            step_order: 0,
+            step_type: "prep" as const,
             description: "",
-            duration_min: null,
-        });
+            duration_min: 0,
+        };
+
+        if (typeof index === "number") {
+            recipeSteps.splice(index + 1, 0, newStep);
+        } else {
+            recipeSteps.push(newStep);
+        }
+
+        // Fix step orders
+        recipeSteps = recipeSteps.map((s, i) => ({ ...s, step_order: i + 1 }));
     };
 
     const removeStep = (index: number) => {
@@ -452,12 +461,14 @@
                                     placeholder="Qty"
                                     class="w-20 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                                 />
-                                <input
-                                    type="text"
+                                <select
                                     bind:value={ing.unit}
-                                    placeholder="Unit"
                                     class="flex-1 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
-                                />
+                                >
+                                    {#each COMMON_UNITS as u}
+                                        <option value={u}>{u}</option>
+                                    {/each}
+                                </select>
                                 <label
                                     class="flex items-center gap-1 px-2 whitespace-nowrap"
                                 >
@@ -553,15 +564,17 @@
                     <Clock size={16} />
                     <span>Cooking Steps</span>
                 </div>
-                <button
-                    onclick={addStep}
-                    class="text-accent text-sm font-bold flex items-center gap-1 hover:bg-accent/5 px-2 py-1 rounded transition"
-                >
-                    <Plus size={16} />
-                    Add Step
-                </button>
+                {#if recipeSteps.length === 0}
+                    <button
+                        onclick={() => addStep()}
+                        class="text-accent text-sm font-bold flex items-center gap-1 hover:bg-accent/5 px-2 py-1 rounded transition"
+                    >
+                        <Plus size={16} />
+                        Add First Step
+                    </button>
+                {/if}
             </div>
-            <div class="space-y-4">
+            <div class="space-y-0">
                 {#each recipeSteps as step, i}
                     <div
                         class="bg-surface p-4 rounded-xl border border-line shadow-sm space-y-3 relative"
@@ -603,6 +616,22 @@
                                 class="w-32 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm outline-none"
                             />
                         </div>
+                    </div>
+
+                    <div class="py-2">
+                        <button
+                            onclick={() => addStep(i)}
+                            class="w-full py-2 border-2 border-dashed border-line rounded-xl flex items-center justify-center text-foreground-subtle hover:text-accent hover:border-accent/30 hover:bg-accent/5 transition-all group"
+                        >
+                            <Plus
+                                size={16}
+                                class="group-hover:scale-125 transition-transform mr-2"
+                            />
+                            <span
+                                class="text-xs font-bold uppercase tracking-widest"
+                                >Next Step</span
+                            >
+                        </button>
                     </div>
                 {/each}
                 {#if recipeSteps.length === 0}

@@ -34,10 +34,14 @@
             // Take 5 most recent logs
             recentLogs = logs.slice(0, 5);
 
-            // Filter ingredients with low quantity (less than 2 units for now)
-            // Ideally this would be a user-defined threshold per ingredient
+            // Filter ingredients with low quantity based on their restock threshold
             lowIngredients = inventory
-                .filter((i) => i.inventory && i.inventory.quantity < 2)
+                .filter((i) => {
+                    if (!i.inventory) return false;
+                    // If threshold is set, use it. Otherwise use a default of 2.
+                    const threshold = i.restock_threshold ?? 2;
+                    return i.inventory.quantity <= threshold;
+                })
                 .slice(0, 5);
 
             recipes = allRecipes;

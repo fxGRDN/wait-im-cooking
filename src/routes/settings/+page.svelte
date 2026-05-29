@@ -14,6 +14,8 @@
         Info,
         ChefHat,
         Hand,
+        Tag as TagIcon,
+        ChevronRight,
     } from "lucide-svelte";
     import { onMount } from "svelte";
 
@@ -166,6 +168,43 @@
             </div>
         </section>
 
+        <!-- General / Data Management -->
+        <section class="space-y-4">
+            <div
+                class="flex items-center gap-2 text-foreground-muted font-bold text-sm uppercase tracking-wider"
+            >
+                <TagIcon size={16} />
+                <span>General</span>
+            </div>
+
+            <div
+                class="bg-surface rounded-2xl border border-line shadow-sm overflow-hidden divide-y divide-line"
+            >
+                <a
+                    href="/settings/tags"
+                    class="p-4 flex items-center justify-between hover:bg-surface-raised transition group"
+                >
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-surface-sunken flex items-center justify-center text-foreground-muted group-hover:text-accent transition-colors"
+                        >
+                            <TagIcon size={20} />
+                        </div>
+                        <div>
+                            <p class="font-bold">Recipe Tags</p>
+                            <p class="text-xs text-foreground-muted">
+                                Manage categories and labels
+                            </p>
+                        </div>
+                    </div>
+                    <ChevronRight
+                        size={18}
+                        class="text-line-strong group-hover:text-accent transition"
+                    />
+                </a>
+            </div>
+        </section>
+
         <!-- About / Metadata Section -->
         <section class="space-y-4">
             <div
@@ -185,7 +224,7 @@
                         <ChefHat size={32} />
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg">Wait, I'm cooking</h3>
+                        <h3 class="font-bold text-lg">Wait, I'm Cooking!</h3>
                         <p class="text-sm text-foreground-muted">
                             v0.1.0-alpha
                         </p>
@@ -194,27 +233,10 @@
 
                 <div class="space-y-4 pt-4 border-t border-line">
                     <div class="flex justify-between text-sm">
-                        <span class="text-foreground-muted">Project Lead</span>
-                        <span class="font-bold">Felix</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-foreground-muted">Course</span>
-                        <span class="font-bold italic">SMM, P</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-foreground-muted">Instructor</span>
-                        <span class="font-bold">dr inż. Jakub Długosz</span>
+                        <span class="text-foreground-muted">Author</span>
+                        <span class="font-bold">Kacper Borys</span>
                     </div>
                 </div>
-
-                <p
-                    class="text-[10px] text-foreground-subtle text-center leading-relaxed"
-                >
-                    This project is a multimedia application designed for the
-                    "SMM, P" course at Wroclaw University of Science and
-                    Technology. All multimedia assets are either original or
-                    used under appropriate free licenses.
-                </p>
             </div>
         </section>
     </div>

@@ -22,6 +22,7 @@ pub struct Ingredient {
     pub id: Uuid,
     pub name: String,
     pub default_unit: Option<String>,
+    pub restock_threshold: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,6 +39,7 @@ pub struct IngredientWithInventory {
     pub id: Uuid,
     pub name: String,
     pub default_unit: Option<String>,
+    pub restock_threshold: Option<f64>,
     pub inventory: Option<IngredientInventory>,
 }
 
@@ -141,12 +143,14 @@ pub struct RecipeHistoryWithImages {
 pub struct CreateIngredientInput {
     pub name: String,
     pub default_unit: Option<String>,
+    pub restock_threshold: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateIngredientInput {
     pub name: Option<String>,
     pub default_unit: Option<String>,
+    pub restock_threshold: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -203,6 +207,10 @@ pub struct UpdateRecipeInput {
     pub cook_time: Option<i64>,
     pub is_favourite: Option<bool>,
     pub cover_image: Option<String>,
+    pub ingredients: Option<Vec<RecipeIngredientInput>>,
+    pub components: Option<Vec<RecipeComponentInput>>,
+    pub steps: Option<Vec<StepInput>>,
+    pub tag_ids: Option<Vec<Uuid>>,
 }
 
 #[derive(Debug, Deserialize)]
