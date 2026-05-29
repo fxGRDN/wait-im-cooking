@@ -4,12 +4,16 @@ import { writable } from "svelte/store";
 export interface Settings {
   fontScale: number; // 80 to 150
   leftHandedMode: boolean;
+  pickedVideo: string | null;
+  pickedMusic: string | null;
 }
 
 const storageKey = "wait-im-cooking-settings";
 const defaultSettings: Settings = {
   fontScale: 100,
   leftHandedMode: false,
+  pickedVideo: null,
+  pickedMusic: null,
 };
 
 function readStoredSettings(): Settings {
@@ -49,4 +53,12 @@ export function updateFontScale(scale: number) {
 
 export function updateLeftHandedMode(enabled: boolean) {
   settings.update((s) => ({ ...s, leftHandedMode: enabled }));
+}
+
+export function updatePickedVideo(path: string | null) {
+  settings.update((s) => ({ ...s, pickedVideo: path }));
+}
+
+export function updatePickedMusic(path: string | null) {
+  settings.update((s) => ({ ...s, pickedMusic: path }));
 }
