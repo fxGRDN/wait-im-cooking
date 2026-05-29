@@ -19,6 +19,7 @@
     "fs:allow-read-file",
     "fs:read-all",
     "fs:write-all",
+    "fs:allow-mkdir",
     "fs:scope-appdata-recursive",
     "fs:scope-home-recursive",
     "sql:allow-execute",

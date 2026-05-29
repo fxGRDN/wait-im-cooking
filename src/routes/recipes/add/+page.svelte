@@ -203,6 +203,7 @@
     async function pickCover() {
         const savedPath = await saveImages("recipe_covers");
         if (savedPath) {
+            console.log(`Cover image set to ${coverImage}`);
             coverImage = savedPath[0];
         }
     }

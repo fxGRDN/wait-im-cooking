@@ -15,13 +15,10 @@
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { goto } from "$app/navigation";
-    import EditHistoryModal from "./EditHistoryModal.svelte";
 
     let logs = $state<RecipeHistoryWithImages[]>([]);
     let recipes = $state<Recipe[]>([]);
     let loading = $state(true);
-    let editingLogId = $state<string | null>(null);
-    let isEditModalOpen = $state(false);
 
     async function loadData() {
         loading = true;
@@ -68,9 +65,8 @@
         goto(`/recipes/${id}`);
     }
 
-    function openEditModal(id: string) {
-        editingLogId = id;
-        isEditModalOpen = true;
+    function openEditPage(id: string) {
+        goto(`/recipes/history/${id}`);
     }
 </script>
 
@@ -226,7 +222,7 @@
                                         <ExternalLink size={18} />
                                     </button>
                                     <button
-                                        onclick={() => openEditModal(log.id)}
+                                        onclick={() => openEditPage(log.id)}
                                         class="p-2 text-foreground-subtle hover:text-accent hover:bg-accent/5 rounded-full transition"
                                         title="Edit Cook"
                                     >
@@ -241,14 +237,6 @@
         {/if}
     </div>
 </div>
-
-{#if editingLogId}
-    <EditHistoryModal
-        bind:open={isEditModalOpen}
-        historyId={editingLogId}
-        onUpdated={loadData}
-    />
-{/if}
 
 <style>
     .no-scrollbar::-webkit-scrollbar {

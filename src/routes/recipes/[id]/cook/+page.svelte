@@ -70,14 +70,17 @@
                     recipe_id: recipe.id,
                     servings_made: recipe.servings || 1,
                     duration_min:
-                        recipe.prep_time || 0 + (recipe.cook_time || 0),
+                        (recipe.prep_time || 0) + (recipe.cook_time || 0),
                     rating: 5,
                     notes: null,
                 },
                 [],
                 true,
             );
-            goto(`/recipes/history/${historyId}`);
+            // Redirect to the newly created history entry in edit mode and replace the cooking page in history
+            goto(`/recipes/history/${historyId}?edit=true`, {
+                replaceState: true,
+            });
         } catch (e) {
             console.error(e);
             alert("Failed to log cooking session.");

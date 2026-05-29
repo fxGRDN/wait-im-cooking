@@ -207,7 +207,7 @@
                     <div class="grid gap-3">
                         {#each recentLogs as log}
                             <a
-                                href="/recipes/{log.recipe_id}"
+                                href="/recipes/history/{log.id}"
                                 class="bg-surface p-4 rounded-2xl border border-line shadow-sm hover:border-accent/50 transition flex items-center gap-4 group"
                             >
                                 <div class="flex-1 min-w-0">
