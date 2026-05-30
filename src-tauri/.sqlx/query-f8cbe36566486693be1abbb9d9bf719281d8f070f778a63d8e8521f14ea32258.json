@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, title, description, servings, prep_time, cook_time, is_favourite, cover_image, created_at, updated_at FROM recipes ORDER BY created_at DESC",
+  "query": "SELECT id as \"id!\", title, description, servings, prep_time, cook_time, is_favourite as \"is_favourite: bool\", cover_image, created_at, updated_at FROM recipes ORDER BY created_at DESC",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id!",
         "ordinal": 0,
         "type_info": "Text"
       },
@@ -34,7 +34,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "is_favourite",
+        "name": "is_favourite: bool",
         "ordinal": 6,
         "type_info": "Integer"
       },
@@ -70,5 +70,5 @@
       false
     ]
   },
-  "hash": "f49a6af4865751f20189521a04339ba8f1292d3553a30bebcf5d5fd582e942ee"
+  "hash": "f8cbe36566486693be1abbb9d9bf719281d8f070f778a63d8e8521f14ea32258"
 }

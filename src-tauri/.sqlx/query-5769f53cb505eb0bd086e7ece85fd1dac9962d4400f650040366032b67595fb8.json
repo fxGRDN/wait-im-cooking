@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO ingredients (id, name, default_unit, restock_threshold) VALUES (?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "5769f53cb505eb0bd086e7ece85fd1dac9962d4400f650040366032b67595fb8"
+}

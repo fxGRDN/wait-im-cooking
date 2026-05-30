@@ -87,7 +87,11 @@
 
     async function loadRecipe() {
         try {
-            if (!id) error = "Id not found";
+            if (!id) {
+                error = "Id not found";
+                return;
+            }
+
             const [recipeData, logs] = await Promise.all([
                 getRecipeWithTree(id),
                 getCookLogs(id),

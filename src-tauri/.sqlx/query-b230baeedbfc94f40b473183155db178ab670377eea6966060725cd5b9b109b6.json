@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM recipe_tags WHERE recipe_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "b230baeedbfc94f40b473183155db178ab670377eea6966060725cd5b9b109b6"
+}

@@ -23,12 +23,12 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+        class="fixed inset-0 z-100 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
         transition:fade={{ duration: 200 }}
         onclick={onClose}
     >
         <button
-            class="absolute top-[calc(1rem+env(safe-area-inset-top))] right-4 z-[110] p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition"
+            class="absolute top-[calc(1rem+env(safe-area-inset-top))] right-4 z-110 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition"
             onclick={(e) => {
                 e.stopPropagation();
                 onClose();

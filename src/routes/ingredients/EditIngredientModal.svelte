@@ -21,7 +21,7 @@
 
     let name = $state("");
     let quantity = $state<number | "">("");
-    let unit = $state(COMMON_UNITS[0]);
+    let unit: string = $state(COMMON_UNITS[0]);
     let threshold = $state<number | "">("");
     let saving = $state(false);
     let deleting = $state(false);
@@ -31,7 +31,10 @@
         if (open && ingredient) {
             name = ingredient.name;
             quantity = ingredient.inventory?.quantity ?? "";
-            unit = ingredient.inventory?.unit ?? ingredient.default_unit ?? COMMON_UNITS[0];
+            unit =
+                ingredient.inventory?.unit ??
+                ingredient.default_unit ??
+                COMMON_UNITS[0];
             threshold = ingredient.restock_threshold ?? "";
             error = null;
         }
@@ -75,7 +78,13 @@
     };
 
     const handleDelete = async () => {
-        if (!ingredient || !confirm(`Delete "${ingredient.name}" from library? This cannot be undone.`)) return;
+        if (
+            !ingredient ||
+            !confirm(
+                `Delete "${ingredient.name}" from library? This cannot be undone.`,
+            )
+        )
+            return;
 
         deleting = true;
         try {
@@ -127,8 +136,9 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-medium" for="edit-ingredient-name"
-                        >Name</label
+                    <label
+                        class="text-sm font-medium"
+                        for="edit-ingredient-name">Name</label
                     >
                     <input
                         id="edit-ingredient-name"
@@ -157,8 +167,9 @@
                         />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-medium" for="edit-ingredient-unit"
-                            >Unit</label
+                        <label
+                            class="text-sm font-medium"
+                            for="edit-ingredient-unit">Unit</label
                         >
                         <select
                             id="edit-ingredient-unit"
@@ -176,8 +187,7 @@
                 <div class="space-y-2">
                     <label
                         class="text-sm font-medium"
-                        for="edit-ingredient-threshold"
-                        >Restock Threshold</label
+                        for="edit-ingredient-threshold">Restock Threshold</label
                     >
                     <input
                         id="edit-ingredient-threshold"

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE ingredients SET restock_threshold = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "0166e49672757adf18a1493a380e233ea4c48af67923bce3708150d7e6b95c4a"
+}

@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id as \"id!\", title, description, servings, prep_time, cook_time, is_favourite as \"is_favourite: bool\", cover_image, created_at, updated_at FROM recipes WHERE title LIKE ? OR description LIKE ? ORDER BY created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "description",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "servings",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "prep_time",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "cook_time",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "is_favourite: bool",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "cover_image",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 9,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "91bcd1a1b763ef21d927bf00d2422ee4b36253585379fbdf3a28ef82acecb502"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM steps WHERE recipe_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "67e55fffb3b93cc2f53d5cf3d37f3151e76f1330cab2fb295824c66cc16923cc"
+}

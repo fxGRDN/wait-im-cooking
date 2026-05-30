@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT t.id, t.name FROM tags t JOIN recipe_tags rt ON rt.tag_id = t.id WHERE rt.recipe_id = ?",
+  "query": "SELECT t.id as \"id!\", t.name FROM tags t JOIN recipe_tags rt ON rt.tag_id = t.id WHERE rt.recipe_id = ?",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id!",
         "ordinal": 0,
         "type_info": "Text"
       },
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "259f4dccaaeeda865ff67a289e45c265c6beafa2e4492ad196ceb8ab347cb66e"
+  "hash": "04fcfd413389f47550b3ce9f2111ceabed3d3b6010c08062bcce35f9a7bb3da6"
 }

@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, title, description, servings, prep_time, cook_time, is_favourite, cover_image, created_at, updated_at FROM recipes WHERE title LIKE ? OR description LIKE ? ORDER BY created_at DESC",
+  "query": "SELECT id as \"id!\", title, description, servings, prep_time, cook_time, is_favourite as \"is_favourite: bool\", cover_image, created_at, updated_at FROM recipes WHERE id = ?",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id!",
         "ordinal": 0,
         "type_info": "Text"
       },
@@ -34,7 +34,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "is_favourite",
+        "name": "is_favourite: bool",
         "ordinal": 6,
         "type_info": "Integer"
       },
@@ -55,7 +55,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       true,
@@ -70,5 +70,5 @@
       false
     ]
   },
-  "hash": "792f3ad94e33f96225aa1acfea28e5d06e960327b739ea7ab58907de7d0e1046"
+  "hash": "bdb245b8a68863a5ac4a0ed0d67732e02dcff33909a26f24293d8dbfb8d8c3e8"
 }

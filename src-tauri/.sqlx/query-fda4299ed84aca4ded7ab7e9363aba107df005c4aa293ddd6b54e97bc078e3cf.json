@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id as \"id!\", name, default_unit FROM ingredients WHERE name LIKE ? ORDER BY name ASC",
+  "query": "SELECT id as \"id!\", name, default_unit, restock_threshold FROM ingredients ORDER BY name ASC",
   "describe": {
     "columns": [
       {
@@ -17,16 +17,22 @@
         "name": "default_unit",
         "ordinal": 2,
         "type_info": "Text"
+      },
+      {
+        "name": "restock_threshold",
+        "ordinal": 3,
+        "type_info": "Float"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 0
     },
     "nullable": [
       true,
       false,
+      true,
       true
     ]
   },
-  "hash": "b0859b4c7339559ac00bc6d308045b208e78e35f1ac3ae13d6dd27304e1a89f0"
+  "hash": "fda4299ed84aca4ded7ab7e9363aba107df005c4aa293ddd6b54e97bc078e3cf"
 }

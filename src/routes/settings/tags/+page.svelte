@@ -211,12 +211,12 @@
                 <div class="grid grid-cols-1 gap-2" transition:fade>
                     {#each filteredTags as tag (tag.id)}
                         <div
-                            class="flex items-center justify-between p-4 bg-surface rounded-xl border border-line shadow-sm group hover:border-accent/30 transition min-h-[4rem]"
+                            class="flex items-center justify-between p-4 bg-surface rounded-xl border border-line shadow-sm group hover:border-accent/30 transition min-h-16"
                             transition:slide|local
                         >
                             <div class="flex-1 flex items-center gap-3">
                                 <div
-                                    class="w-8 h-8 rounded-lg bg-accent/10 flex-shrink-0 flex items-center justify-center text-accent"
+                                    class="w-8 h-8 rounded-lg bg-accent/10 shrink-0 flex items-center justify-center text-accent"
                                 >
                                     <TagIcon size={16} />
                                 </div>
@@ -230,7 +230,6 @@
                                             type="text"
                                             bind:value={editName}
                                             class="flex-1 bg-surface-sunken border border-accent/30 rounded-lg px-3 py-1 text-sm outline-none focus:ring-1 focus:ring-accent/20"
-                                            autofocus
                                             onkeydown={(e) => {
                                                 if (e.key === "Enter")
                                                     handleUpdateTag();

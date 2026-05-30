@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM recipe_components WHERE parent_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "95624c8929e01a6de3239efb11e52de3f4c2889dc1c6b1dbfd961d2139ed9cb0"
+}

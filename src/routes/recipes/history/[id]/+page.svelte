@@ -48,6 +48,7 @@
     let newImages = $state<string[]>([]);
     let imagesToRemove = $state<string[]>([]);
 
+    let activeImageIndex = $state(0);
     let previewImage = $state<string | null>(null);
 
     onMount(async () => {
@@ -257,93 +258,136 @@
                     {/if}
                 </div>
 
-                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                    {#each log.images as img}
-                        <div
-                            class="relative flex-shrink-0 w-48 aspect-square rounded-3xl border border-line overflow-hidden shadow-sm"
-                        >
-                            <!-- svelte-ignore a11y_click_events_have_key_events -->
-                            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                            <img
-                                src={convertFileSrc(img.file_path)}
-                                alt="Dish"
-                                class="w-full h-full object-cover {isEditing &&
-                                imagesToRemove.includes(img.id)
-                                    ? 'opacity-30 grayscale'
-                                    : ''} {!isEditing
-                                    ? 'cursor-zoom-in active:scale-[0.98] transition'
-                                    : ''}"
-                                onclick={() =>
-                                    !isEditing &&
-                                    (previewImage = convertFileSrc(
-                                        img.file_path,
-                                    ))}
-                            />
-                            {#if isEditing}
-                                <button
-                                    onclick={() => toggleRemoveImage(img.id)}
-                                    class="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1"
-                                >
-                                    {#if imagesToRemove.includes(img.id)}
-                                        <RotateCcw size={14} />
-                                    {:else}
-                                        <X size={14} />
-                                    {/if}
-                                </button>
-                            {/if}
-                        </div>
-                    {/each}
-                    {#if isEditing}
-                        {#each newImages as img, i}
+                <div class="relative group">
+                    <div
+                        id="history-gallery"
+                        class="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
+                        onscroll={(e) => {
+                            const el = e.currentTarget;
+                            const width = el.clientWidth + 16; // width + gap
+                            activeImageIndex = Math.round(
+                                el.scrollLeft / width,
+                            );
+                        }}
+                    >
+                        {#each log.images as img, i}
                             <div
-                                class="relative flex-shrink-0 w-48 aspect-square rounded-3xl border-2 border-accent border-dashed overflow-hidden shadow-sm"
+                                class="relative shrink-0 w-full snap-center aspect-square rounded-3xl border border-line overflow-hidden shadow-sm"
                             >
+                                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                                 <img
-                                    src={convertFileSrc(img)}
-                                    alt="New Dish"
-                                    class="w-full h-full object-cover opacity-60"
-                                />
-                                <div
-                                    class="absolute inset-0 flex items-center justify-center"
-                                >
-                                    <span
-                                        class="bg-accent text-background text-[10px] font-bold px-2 py-1 rounded-full uppercase"
-                                        >Pending</span
-                                    >
-                                </div>
-                                <button
+                                    src={convertFileSrc(img.file_path)}
+                                    alt="Dish"
+                                    class="w-full h-full object-cover {isEditing &&
+                                    imagesToRemove.includes(img.id)
+                                        ? 'opacity-30 grayscale'
+                                        : ''} {!isEditing
+                                        ? 'cursor-zoom-in active:scale-[0.98] transition'
+                                        : ''}"
                                     onclick={() =>
-                                        (newImages = newImages.filter(
-                                            (_, idx) => idx !== i,
+                                        !isEditing &&
+                                        (previewImage = convertFileSrc(
+                                            img.file_path,
                                         ))}
-                                    class="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1"
-                                >
-                                    <X size={14} />
-                                </button>
+                                />
+                                {#if isEditing}
+                                    <button
+                                        onclick={() =>
+                                            toggleRemoveImage(img.id)}
+                                        class="absolute top-4 right-4 bg-black/50 text-white rounded-full p-2 backdrop-blur-md z-10"
+                                    >
+                                        {#if imagesToRemove.includes(img.id)}
+                                            <RotateCcw size={18} />
+                                        {:else}
+                                            <X size={18} />
+                                        {/if}
+                                    </button>
+                                {/if}
                             </div>
                         {/each}
-                    {/if}
+                        {#if isEditing}
+                            {#each newImages as img, i}
+                                <div
+                                    class="relative shrink-0 w-full snap-center aspect-square rounded-3xl border-2 border-accent border-dashed overflow-hidden shadow-sm"
+                                >
+                                    <img
+                                        src={convertFileSrc(img)}
+                                        alt="New Dish"
+                                        class="w-full h-full object-cover opacity-60"
+                                    />
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center"
+                                    >
+                                        <span
+                                            class="bg-accent text-background text-[10px] font-bold px-2 py-1 rounded-full uppercase"
+                                            >Pending</span
+                                        >
+                                    </div>
+                                    <button
+                                        onclick={() =>
+                                            (newImages = newImages.filter(
+                                                (_, idx) => idx !== i,
+                                            ))}
+                                        class="absolute top-4 right-4 bg-black/50 text-white rounded-full p-2 backdrop-blur-md z-10"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                            {/each}
+                        {/if}
 
-                    {#if isEditing && log.images.length === 0 && newImages.length === 0}
-                        <button
-                            onclick={pickImages}
-                            class="w-full aspect-video bg-surface-sunken rounded-3xl border-2 border-dashed border-line flex flex-col items-center justify-center text-foreground-subtle gap-2 hover:bg-surface-raised transition"
-                        >
-                            <Camera size={32} strokeWidth={1.5} />
-                            <span
-                                class="text-xs font-bold uppercase tracking-wider"
-                                >Add dish photos</span
+                        {#if isEditing && log.images.length === 0 && newImages.length === 0}
+                            <button
+                                onclick={pickImages}
+                                class="w-full aspect-square bg-surface-sunken rounded-3xl border-2 border-dashed border-line flex flex-col items-center justify-center text-foreground-subtle gap-2 hover:bg-surface-raised transition"
                             >
-                        </button>
-                    {:else if !isEditing && log.images.length === 0}
+                                <Camera size={32} strokeWidth={1.5} />
+                                <span
+                                    class="text-xs font-bold uppercase tracking-wider"
+                                    >Add dish photos</span
+                                >
+                            </button>
+                        {:else if !isEditing && log.images.length === 0}
+                            <div
+                                class="w-full aspect-square bg-surface-sunken rounded-3xl border border-line flex flex-col items-center justify-center text-foreground-subtle gap-2"
+                            >
+                                <Camera size={32} strokeWidth={1.5} />
+                                <span
+                                    class="text-xs font-bold uppercase tracking-wider"
+                                    >No photos for this cook</span
+                                >
+                            </div>
+                        {/if}
+                    </div>
+
+                    {#if log.images.length + (isEditing ? newImages.length : 0) > 1}
                         <div
-                            class="w-full aspect-video bg-surface-sunken rounded-3xl border border-line flex flex-col items-center justify-center text-foreground-subtle gap-2"
+                            class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-2 bg-black/60 backdrop-blur-md rounded-full z-20 shadow-xl border border-white/10"
                         >
-                            <Camera size={32} strokeWidth={1.5} />
-                            <span
-                                class="text-xs font-bold uppercase tracking-wider"
-                                >No photos for this cook</span
-                            >
+                            {#each Array(log.images.length + (isEditing ? newImages.length : 0)) as _, i}
+                                <button
+                                    onclick={() => {
+                                        const gallery =
+                                            document.getElementById(
+                                                "history-gallery",
+                                            );
+                                        if (gallery) {
+                                            const width =
+                                                gallery.clientWidth + 16;
+                                            gallery.scrollTo({
+                                                left: i * width,
+                                                behavior: "smooth",
+                                            });
+                                        }
+                                    }}
+                                    class="h-1.5 rounded-full transition-all duration-300 {i ===
+                                    activeImageIndex
+                                        ? 'bg-accent w-5'
+                                        : 'bg-white/30 w-1.5 hover:bg-white/50'}"
+                                    aria-label="Go to image {i + 1}"
+                                ></button>
+                            {/each}
                         </div>
                     {/if}
                 </div>

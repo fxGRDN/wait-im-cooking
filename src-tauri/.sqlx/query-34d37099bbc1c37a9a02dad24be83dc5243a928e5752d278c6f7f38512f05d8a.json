@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT ri.ingredient_id, ri.quantity, ri.unit, ri.is_optional,\n                   i.name, i.default_unit\n            FROM recipe_ingredients ri\n            JOIN ingredients i ON i.id = ri.ingredient_id\n            WHERE ri.recipe_id = ?\n            ",
+  "query": "\n            SELECT ri.ingredient_id, ri.quantity, ri.unit, ri.is_optional as \"is_optional: bool\",\n                   i.name, i.default_unit, i.restock_threshold\n            FROM recipe_ingredients ri\n            JOIN ingredients i ON i.id = ri.ingredient_id\n            WHERE ri.recipe_id = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -19,7 +19,7 @@
         "type_info": "Text"
       },
       {
-        "name": "is_optional",
+        "name": "is_optional: bool",
         "ordinal": 3,
         "type_info": "Integer"
       },
@@ -32,6 +32,11 @@
         "name": "default_unit",
         "ordinal": 5,
         "type_info": "Text"
+      },
+      {
+        "name": "restock_threshold",
+        "ordinal": 6,
+        "type_info": "Float"
       }
     ],
     "parameters": {
@@ -43,8 +48,9 @@
       false,
       false,
       false,
+      true,
       true
     ]
   },
-  "hash": "4b3e7f8b8ab6bc05e6418dca94faeaf8587ee5f754ba3d094c015e436cc496ce"
+  "hash": "34d37099bbc1c37a9a02dad24be83dc5243a928e5752d278c6f7f38512f05d8a"
 }

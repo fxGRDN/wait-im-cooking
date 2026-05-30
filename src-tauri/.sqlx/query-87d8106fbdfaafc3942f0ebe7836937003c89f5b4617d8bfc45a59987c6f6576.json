@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                i.id as \"id!\",\n                i.name,\n                i.default_unit,\n                ii.id         AS inv_id,\n                ii.quantity   AS inv_quantity,\n                ii.unit       AS inv_unit,\n                ii.expires_at AS inv_expires_at\n            FROM ingredients i\n            LEFT JOIN ingredient_inventory ii ON ii.ingredient_id = i.id\n            WHERE i.id = ?\n            ",
+  "query": "\n            SELECT\n                i.id as \"id!\",\n                i.name,\n                i.default_unit,\n                i.restock_threshold,\n                ii.id         AS inv_id,\n                ii.quantity   AS inv_quantity,\n                ii.unit       AS inv_unit,\n                ii.expires_at AS inv_expires_at\n            FROM ingredients i\n            LEFT JOIN ingredient_inventory ii ON ii.ingredient_id = i.id\n            WHERE i.id = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -19,23 +19,28 @@
         "type_info": "Text"
       },
       {
-        "name": "inv_id",
+        "name": "restock_threshold",
         "ordinal": 3,
+        "type_info": "Float"
+      },
+      {
+        "name": "inv_id",
+        "ordinal": 4,
         "type_info": "Text"
       },
       {
         "name": "inv_quantity",
-        "ordinal": 4,
+        "ordinal": 5,
         "type_info": "Float"
       },
       {
         "name": "inv_unit",
-        "ordinal": 5,
+        "ordinal": 6,
         "type_info": "Text"
       },
       {
         "name": "inv_expires_at",
-        "ordinal": 6,
+        "ordinal": 7,
         "type_info": "Text"
       }
     ],
@@ -47,10 +52,11 @@
       false,
       true,
       true,
+      true,
       false,
       false,
       true
     ]
   },
-  "hash": "196ba5f78353cd1b4652ad3daaeaca40139615434e5082c83c4b050ba76d7263"
+  "hash": "87d8106fbdfaafc3942f0ebe7836937003c89f5b4617d8bfc45a59987c6f6576"
 }

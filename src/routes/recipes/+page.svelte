@@ -193,7 +193,7 @@
                     >
                         {#if recipe.cover_image}
                             <div
-                                class="w-28 h-full sm:w-32 flex-shrink-0 overflow-hidden"
+                                class="w-28 h-full sm:w-32 shrink-0 overflow-hidden"
                             >
                                 <img
                                     src={convertFileSrc(recipe.cover_image)}
@@ -203,7 +203,7 @@
                             </div>
                         {:else}
                             <div
-                                class="w-28 h-full sm:w-32 flex-shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
+                                class="w-28 h-full sm:w-32 shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
                             >
                                 <ChefHat size={32} strokeWidth={1.5} />
                             </div>

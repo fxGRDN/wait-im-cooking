@@ -19,6 +19,7 @@
     let logs = $state<RecipeHistoryWithImages[]>([]);
     let recipes = $state<Recipe[]>([]);
     let loading = $state(true);
+    let activeIndices = $state<Record<string, number>>({});
 
     async function loadData() {
         loading = true;
@@ -114,6 +115,12 @@
                             <div class="relative group">
                                 <div
                                     class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
+                                    onscroll={(e) => {
+                                        const el = e.currentTarget;
+                                        activeIndices[log.id] = Math.round(
+                                            el.scrollLeft / el.clientWidth,
+                                        );
+                                    }}
                                 >
                                     {#each log.images as img}
                                         <div
@@ -131,11 +138,14 @@
                                 </div>
                                 {#if log.images.length > 1}
                                     <div
-                                        class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-md rounded-full"
+                                        class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-full border border-white/10 shadow-lg"
                                     >
                                         {#each log.images as _, i}
                                             <div
-                                                class="w-1.5 h-1.5 rounded-full bg-surface/50"
+                                                class="h-1.5 rounded-full transition-all duration-300 {i ===
+                                                (activeIndices[log.id] ?? 0)
+                                                    ? 'bg-accent w-4'
+                                                    : 'bg-white/30 w-1.5'}"
                                             ></div>
                                         {/each}
                                     </div>
