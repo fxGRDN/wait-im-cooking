@@ -9,6 +9,20 @@ pub struct SqliteRecipeRepository {
     pool: SqlitePool,
 }
 
+#[derive(sqlx::FromRow)]
+struct RecipeRow {
+    id: String,
+    title: String,
+    description: Option<String>,
+    servings: Option<i64>,
+    prep_time: Option<i64>,
+    cook_time: Option<i64>,
+    is_favourite: bool,
+    cover_image: Option<String>,
+    created_at: String,
+    updated_at: String,
+}
+
 impl SqliteRecipeRepository {
     pub fn new(pool: SqlitePool) -> Self {
         Self { pool }
@@ -104,16 +118,7 @@ impl SqliteRecipeRepository {
         })
         .collect();
 
-        let tags = sqlx::query!(
-            "SELECT t.id as \"id!\", t.name FROM tags t JOIN recipe_tags rt ON rt.tag_id = t.id WHERE rt.recipe_id = ?",
-            recipe.id
-        )
-        .fetch_all(&self.pool)
-        .await
-        .map_err(|e| e.to_string())?
-        .into_iter()
-        .map(|r| Tag { id: r.id, name: r.name })
-        .collect();
+        let tags = self.fetch_tags(&recipe.id).await?;
 
         Ok(RecipeWithTree {
             id: recipe.id,
@@ -132,49 +137,158 @@ impl SqliteRecipeRepository {
             tags,
         })
     }
+
+    async fn fetch_tags(&self, recipe_id: &str) -> RepoResult<Vec<Tag>> {
+        let tags = sqlx::query!(
+            "SELECT t.id as \"id!\", t.name FROM tags t JOIN recipe_tags rt ON rt.tag_id = t.id WHERE rt.recipe_id = ?",
+            recipe_id
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| e.to_string())?
+        .into_iter()
+        .map(|r| Tag { id: r.id, name: r.name })
+        .collect();
+        Ok(tags)
+    }
+
+    async fn map_rows_to_recipes(&self, rows: Vec<RecipeRow>) -> RepoResult<Vec<Recipe>> {
+        let mut recipes = vec![];
+        for r in rows {
+            let tags = self.fetch_tags(&r.id).await?;
+            recipes.push(Recipe {
+                id: r.id,
+                title: r.title,
+                description: r.description,
+                servings: r.servings,
+                prep_time: r.prep_time,
+                cook_time: r.cook_time,
+                is_favourite: r.is_favourite,
+                cover_image: r.cover_image,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
+                tags,
+            });
+        }
+        Ok(recipes)
+    }
 }
 
 #[async_trait]
 impl RecipeRepository for SqliteRecipeRepository {
     async fn find_all(&self) -> RepoResult<Vec<Recipe>> {
-        sqlx::query_as!(
-            Recipe,
+        let rows = sqlx::query!(
             r#"SELECT id as "id!", title, description, servings, prep_time, cook_time, is_favourite as "is_favourite: bool", cover_image, created_at, updated_at FROM recipes ORDER BY created_at DESC"#
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        let row_objects = rows
+            .into_iter()
+            .map(|r| RecipeRow {
+                id: r.id,
+                title: r.title,
+                description: r.description,
+                servings: r.servings,
+                prep_time: r.prep_time,
+                cook_time: r.cook_time,
+                is_favourite: r.is_favourite,
+                cover_image: r.cover_image,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
+            })
+            .collect();
+
+        self.map_rows_to_recipes(row_objects).await
     }
 
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Recipe>> {
-        sqlx::query_as!(
-            Recipe,
+        let row = sqlx::query!(
             r#"SELECT id as "id!", title, description, servings, prep_time, cook_time, is_favourite as "is_favourite: bool", cover_image, created_at, updated_at FROM recipes WHERE id = ?"#,
             id
         )
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        if let Some(r) = row {
+            let tags = self.fetch_tags(&r.id).await?;
+            Ok(Some(Recipe {
+                id: r.id,
+                title: r.title,
+                description: r.description,
+                servings: r.servings,
+                prep_time: r.prep_time,
+                cook_time: r.cook_time,
+                is_favourite: r.is_favourite,
+                cover_image: r.cover_image,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
+                tags,
+            }))
+        } else {
+            Ok(None)
+        }
     }
 
     async fn find_with_tree(&self, id: &str) -> RepoResult<Option<RecipeWithTree>> {
-        let recipe = self.find_by_id(id).await?;
-        match recipe {
-            Some(r) => Ok(Some(self.resolve_tree(r).await?)),
+        let row = sqlx::query!(
+            r#"SELECT id as "id!", title, description, servings, prep_time, cook_time, is_favourite as "is_favourite: bool", cover_image, created_at, updated_at FROM recipes WHERE id = ?"#,
+            id
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+        match row {
+            Some(r) => Ok(Some(
+                self.resolve_tree(Recipe {
+                    id: r.id,
+                    title: r.title,
+                    description: r.description,
+                    servings: r.servings,
+                    prep_time: r.prep_time,
+                    cook_time: r.cook_time,
+                    is_favourite: r.is_favourite,
+                    cover_image: r.cover_image,
+                    created_at: r.created_at,
+                    updated_at: r.updated_at,
+                    tags: vec![], // tags will be fetched inside resolve_tree
+                })
+                .await?,
+            )),
             None => Ok(None),
         }
     }
 
     async fn search(&self, query: &str) -> RepoResult<Vec<Recipe>> {
         let pattern = format!("%{}%", query);
-        sqlx::query_as!(
-            Recipe,
+        let rows = sqlx::query!(
             r#"SELECT id as "id!", title, description, servings, prep_time, cook_time, is_favourite as "is_favourite: bool", cover_image, created_at, updated_at FROM recipes WHERE title LIKE ? OR description LIKE ? ORDER BY created_at DESC"#,
             pattern, pattern
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        let row_objects = rows
+            .into_iter()
+            .map(|r| RecipeRow {
+                id: r.id,
+                title: r.title,
+                description: r.description,
+                servings: r.servings,
+                prep_time: r.prep_time,
+                cook_time: r.cook_time,
+                is_favourite: r.is_favourite,
+                cover_image: r.cover_image,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
+            })
+            .collect();
+
+        self.map_rows_to_recipes(row_objects).await
     }
 
     async fn create(&self, input: CreateRecipeInput) -> RepoResult<String> {

@@ -90,7 +90,7 @@ export async function wouldCreateCycle(
   parentId: string,
   childId: string,
 ): Promise<boolean> {
-  return invoke("check_cycle", { parent_id: parentId, child_id: childId });
+  return invoke("check_cycle", { parentId, childId });
 }
 
 // ─────────────────────────────────────────

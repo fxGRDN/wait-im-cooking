@@ -37,6 +37,7 @@ export interface Recipe {
   cover_image: string | null; // relative path
   created_at: ISOTimestamp;
   updated_at: ISOTimestamp;
+  tags: Tag[];
 }
 
 export interface RecipeIngredient {

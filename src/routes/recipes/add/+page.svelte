@@ -223,12 +223,12 @@
         class="border-b border-line px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 mb-4 sticky top-0 z-10 flex justify-between items-center bg-surface"
     >
         <div class="flex items-center gap-2">
-            <a
-                href="/recipes"
+            <button
+                onclick={() => history.back()}
                 class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
             >
                 <ChevronLeft size={24} />
-            </a>
+            </button>
             <h1 class="text-xl font-bold">New Recipe</h1>
         </div>
         <button

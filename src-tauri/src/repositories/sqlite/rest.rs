@@ -93,24 +93,18 @@ impl SqliteRecipeHistoryRepository {
 #[async_trait]
 impl RecipeHistoryRepository for SqliteRecipeHistoryRepository {
     async fn find_all(&self, recipe_id: Option<&str>) -> RepoResult<Vec<RecipeHistory>> {
-        match recipe_id {
-            Some(id) => sqlx::query_as!(
-                RecipeHistory,
-r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, created_at FROM recipe_history WHERE recipe_id = ? ORDER BY created_at DESC"#,
-                id
-            )
-            .fetch_all(&self.pool)
-            .await
-            .map_err(|e| e.to_string()),
+        let sql = if recipe_id.is_some() {
+            r#"SELECT id, recipe_id, servings_made, duration_min, rating, notes, created_at FROM recipe_history WHERE recipe_id = ? ORDER BY created_at DESC"#
+        } else {
+            r#"SELECT id, recipe_id, servings_made, duration_min, rating, notes, created_at FROM recipe_history ORDER BY created_at DESC"#
+        };
 
-            None => sqlx::query_as!(
-                RecipeHistory,
-                r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, created_at FROM recipe_history ORDER BY created_at DESC"#
-            )
-            .fetch_all(&self.pool)
-            .await
-            .map_err(|e| e.to_string()),
+        let mut query = sqlx::query_as::<_, RecipeHistory>(sql);
+        if let Some(id) = recipe_id {
+            query = query.bind(id);
         }
+
+        query.fetch_all(&self.pool).await.map_err(|e| e.to_string())
     }
 
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<RecipeHistoryWithImages>> {
@@ -165,12 +159,8 @@ r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, cr
         }
 
         if input.consume_from_pantry {
-            // we need access to pantry repository here, or just use a trait if possible
-            // but this is implemented in this file!
-            // Wait, RecipeHistoryRepository doesn't have access to PantryRepository directly in this implementation
-            // But we can do it manually or inject it.
-            // Actually, for simplicity right now I will skip the deduetion logic here if it's hard to reach
-            // Or I can add a method to deduet it.
+            // Note: Pantry deduction is handled at the command level (commands.rs)
+            // to keep repositories focused on their primary data types.
         }
 
         tx.commit().await.map_err(|e| e.to_string())?;
@@ -251,6 +241,46 @@ r#"SELECT id as "id!", recipe_id, servings_made, duration_min, rating, notes, cr
 // Pantry
 // ─────────────────────────────────────────
 
+struct UnitConverter;
+
+impl UnitConverter {
+    fn get_family(unit: &str) -> Option<&'static str> {
+        match unit {
+            "g" | "kg" => Some("weight"),
+            "ml" | "l" => Some("volume"),
+            _ => None,
+        }
+    }
+
+    fn normalize(quantity: f64, unit: &str) -> Option<f64> {
+        match unit {
+            "g" | "ml" => Some(quantity),
+            "kg" | "l" => Some(quantity * 1000.0),
+            _ => None,
+        }
+    }
+
+    fn convert(quantity: f64, from_unit: &str, to_unit: &str) -> Option<f64> {
+        if from_unit == to_unit {
+            return Some(quantity);
+        }
+
+        let from_family = Self::get_family(from_unit)?;
+        let to_family = Self::get_family(to_unit)?;
+
+        if from_family != to_family {
+            return None;
+        }
+
+        let q_base = Self::normalize(quantity, from_unit)?;
+        match to_unit {
+            "g" | "ml" => Some(q_base),
+            "kg" | "l" => Some(q_base / 1000.0),
+            _ => None,
+        }
+    }
+}
+
 pub struct SqlitePantryRepository {
     pool: SqlitePool,
     recipes: SqliteRecipeRepository,
@@ -274,21 +304,30 @@ impl SqlitePantryRepository {
                 continue;
             }
             let row = sqlx::query!(
-                "SELECT quantity FROM ingredient_inventory WHERE ingredient_id = ?",
+                "SELECT quantity, unit FROM ingredient_inventory WHERE ingredient_id = ?",
                 ri.ingredient_id
             )
             .fetch_optional(&self.pool)
             .await
             .map_err(|e| e.to_string())?;
 
-            let available = row.map(|r| r.quantity).unwrap_or(0.0);
-            let sufficient = available >= ri.quantity;
+            let (available_in_recipe_unit, sufficient) = match row {
+                Some(r) => {
+                    let conv = UnitConverter::convert(r.quantity, &r.unit, &ri.unit);
+                    match conv {
+                        Some(q) => (q, q >= ri.quantity),
+                        None => (0.0, false), // Incompatible units
+                    }
+                }
+                None => (0.0, false),
+            };
+
             if !sufficient {
                 missing.push(IngredientAvailability {
                     ingredient: ri.ingredient.clone(),
                     required: ri.quantity,
                     unit: ri.unit.clone(),
-                    available,
+                    available: available_in_recipe_unit,
                     sufficient,
                 });
             }
@@ -325,13 +364,27 @@ impl SqlitePantryRepository {
                 continue;
             }
             let deduct = ri.quantity * ratio;
-            sqlx::query!(
-                "UPDATE ingredient_inventory SET quantity = MAX(0, quantity - ?) WHERE ingredient_id = ?",
-                deduct, ri.ingredient_id
+
+            let row = sqlx::query!(
+                "SELECT quantity, unit FROM ingredient_inventory WHERE ingredient_id = ?",
+                ri.ingredient_id
             )
-            .execute(&mut **tx)
+            .fetch_optional(&mut **tx)
             .await
             .map_err(|e| e.to_string())?;
+
+            if let Some(r) = row {
+                let deduct_in_inv_unit =
+                    UnitConverter::convert(deduct, &ri.unit, &r.unit).unwrap_or(deduct);
+
+                sqlx::query!(
+                    "UPDATE ingredient_inventory SET quantity = MAX(0, quantity - ?) WHERE ingredient_id = ?",
+                    deduct_in_inv_unit, ri.ingredient_id
+                )
+                .execute(&mut **tx)
+                .await
+                .map_err(|e| e.to_string())?;
+            }
         }
 
         for comp in &tree.components {
@@ -360,5 +413,42 @@ impl PantryRepository for SqlitePantryRepository {
         self.deduct_tree(&mut tx, recipe_id, ratio).await?;
         tx.commit().await.map_err(|e| e.to_string())?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_unit_converter_normalize() {
+        assert_eq!(UnitConverter::normalize(100.0, "g"), Some(100.0));
+        assert_eq!(UnitConverter::normalize(1.0, "kg"), Some(1000.0));
+        assert_eq!(UnitConverter::normalize(100.0, "ml"), Some(100.0));
+        assert_eq!(UnitConverter::normalize(1.0, "l"), Some(1000.0));
+        assert_eq!(UnitConverter::normalize(1.0, "pcs"), None);
+    }
+
+    #[test]
+    fn test_unit_converter_convert() {
+        // Same units
+        assert_eq!(UnitConverter::convert(100.0, "g", "g"), Some(100.0));
+        assert_eq!(UnitConverter::convert(1.0, "pcs", "pcs"), Some(1.0));
+
+        // Weight to Weight
+        assert_eq!(UnitConverter::convert(1000.0, "g", "kg"), Some(1.0));
+        assert_eq!(UnitConverter::convert(1.5, "kg", "g"), Some(1500.0));
+
+        // Volume to Volume
+        assert_eq!(UnitConverter::convert(500.0, "ml", "l"), Some(0.5));
+        assert_eq!(UnitConverter::convert(2.0, "l", "ml"), Some(2000.0));
+
+        // Weight to Volume (RESTRICTED)
+        assert_eq!(UnitConverter::convert(100.0, "g", "ml"), None);
+        assert_eq!(UnitConverter::convert(100.0, "ml", "g"), None);
+
+        // Incompatible families
+        assert_eq!(UnitConverter::convert(1.0, "pcs", "g"), None);
+        assert_eq!(UnitConverter::convert(100.0, "g", "pcs"), None);
     }
 }

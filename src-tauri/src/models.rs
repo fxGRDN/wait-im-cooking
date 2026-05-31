@@ -17,7 +17,7 @@ pub enum StepType {
 // DB row types
 // ─────────────────────────────────────────
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Ingredient {
     pub id: Uuid,
     pub name: String,
@@ -55,6 +55,7 @@ pub struct Recipe {
     pub cover_image: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    pub tags: Vec<Tag>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -85,7 +86,7 @@ pub struct Step {
     pub duration_min: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Tag {
     pub id: Uuid,
     pub name: String,
@@ -109,7 +110,7 @@ pub struct RecipeWithTree {
     pub tags: Vec<Tag>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct RecipeHistory {
     pub id: Uuid,
     pub recipe_id: Uuid,

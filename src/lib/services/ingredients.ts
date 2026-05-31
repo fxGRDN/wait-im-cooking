@@ -86,5 +86,5 @@ export async function upsertInventory(
 }
 
 export async function deleteInventory(ingredient_id: string): Promise<void> {
-  return invoke("delete_inventory", { ingredient_id });
+  return invoke("delete_inventory", { ingredientId: ingredient_id });
 }

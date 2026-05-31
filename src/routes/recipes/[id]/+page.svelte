@@ -30,9 +30,6 @@
         Heart,
         Trash2,
         Edit2,
-        CheckCircle2,
-        Circle,
-        Play,
         Save,
         X,
         Camera,
@@ -381,12 +378,12 @@
                     <X size={24} />
                 </button>
             {:else}
-                <a
-                    href="/recipes"
+                <button
+                    onclick={() => history.back()}
                     class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
                 >
                     <ChevronLeft size={24} />
-                </a>
+                </button>
             {/if}
             <h1 class="text-xl font-bold truncate max-w-50">
                 {isEditing ? "Edit Recipe" : recipe?.title || "Recipe"}

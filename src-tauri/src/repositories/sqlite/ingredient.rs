@@ -15,16 +15,55 @@ impl SqliteIngredientRepository {
     }
 }
 
+#[derive(sqlx::FromRow)]
+struct IngredientInventoryRow {
+    id: String,
+    name: String,
+    default_unit: Option<String>,
+    restock_threshold: Option<f64>,
+    inv_id: Option<String>,
+    inv_quantity: Option<f64>,
+    inv_unit: Option<String>,
+    inv_expires_at: Option<String>,
+}
+
+impl From<IngredientInventoryRow> for IngredientWithInventory {
+    fn from(r: IngredientInventoryRow) -> Self {
+        IngredientWithInventory {
+            id: r.id.clone(),
+            name: r.name,
+            default_unit: r.default_unit,
+            restock_threshold: r.restock_threshold,
+            inventory: r.inv_id.map(|inv_id| IngredientInventory {
+                id: inv_id,
+                ingredient_id: r.id,
+                quantity: r.inv_quantity.unwrap_or(0.0),
+                unit: r.inv_unit.unwrap_or_default(),
+                expires_at: r.inv_expires_at,
+            }),
+        }
+    }
+}
+
 #[async_trait]
 impl IngredientRepository for SqliteIngredientRepository {
     async fn find_all(&self) -> RepoResult<Vec<Ingredient>> {
-        sqlx::query_as!(
-            Ingredient,
+        let rows = sqlx::query!(
             r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients ORDER BY name ASC"#
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| Ingredient {
+                id: r.id,
+                name: r.name,
+                default_unit: r.default_unit,
+                restock_threshold: r.restock_threshold,
+            })
+            .collect())
     }
 
     async fn find_inventory(&self) -> RepoResult<Vec<IngredientWithInventory>> {
@@ -50,34 +89,37 @@ impl IngredientRepository for SqliteIngredientRepository {
 
         Ok(rows
             .into_iter()
-            .map(|r| {
-                let id = r.id;
-                IngredientWithInventory {
-                    id: id.clone(),
-                    name: r.name,
-                    default_unit: r.default_unit,
-                    restock_threshold: r.restock_threshold,
-                    inventory: Some(IngredientInventory {
-                        id: r.inv_id.expect("IngridientInventory id is missing!"),
-                        ingredient_id: id,
-                        quantity: r.inv_quantity,
-                        unit: r.inv_unit,
-                        expires_at: r.inv_expires_at,
-                    }),
-                }
+            .map(|r| IngredientWithInventory {
+                id: r.id.clone(),
+                name: r.name,
+                default_unit: r.default_unit,
+                restock_threshold: r.restock_threshold,
+                inventory: Some(IngredientInventory {
+                    id: r.inv_id.expect("IngridientInventory id is missing!"),
+                    ingredient_id: r.id,
+                    quantity: r.inv_quantity,
+                    unit: r.inv_unit,
+                    expires_at: r.inv_expires_at,
+                }),
             })
             .collect())
     }
 
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<Ingredient>> {
-        sqlx::query_as!(
-            Ingredient,
+        let row = sqlx::query!(
             r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients WHERE id = ?"#,
             id
         )
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        Ok(row.map(|r| Ingredient {
+            id: r.id,
+            name: r.name,
+            default_unit: r.default_unit,
+            restock_threshold: r.restock_threshold,
+        }))
     }
 
     async fn find_with_inventory(&self, id: &str) -> RepoResult<Option<IngredientWithInventory>> {
@@ -102,34 +144,40 @@ impl IngredientRepository for SqliteIngredientRepository {
         .await
         .map_err(|e| e.to_string())?;
 
-        Ok(row.map(|r| {
-            let id = r.id;
-            IngredientWithInventory {
-                id: id.clone(),
-                name: r.name,
-                default_unit: r.default_unit,
-                restock_threshold: r.restock_threshold,
-                inventory: r.inv_id.map(|inv_id| IngredientInventory {
-                    id: inv_id,
-                    ingredient_id: id.clone(),
-                    quantity: r.inv_quantity,
-                    unit: r.inv_unit,
-                    expires_at: r.inv_expires_at,
-                }),
-            }
+        Ok(row.map(|r| IngredientWithInventory {
+            id: r.id.clone(),
+            name: r.name,
+            default_unit: r.default_unit,
+            restock_threshold: r.restock_threshold,
+            inventory: r.inv_id.map(|inv_id| IngredientInventory {
+                id: inv_id,
+                ingredient_id: r.id,
+                quantity: r.inv_quantity,
+                unit: r.inv_unit,
+                expires_at: r.inv_expires_at,
+            }),
         }))
     }
 
     async fn search(&self, query: &str) -> RepoResult<Vec<Ingredient>> {
         let pattern = format!("%{}%", query);
-        sqlx::query_as!(
-            Ingredient,
+        let rows = sqlx::query!(
             r#"SELECT id as "id!", name, default_unit, restock_threshold FROM ingredients WHERE name LIKE ? ORDER BY name ASC"#,
             pattern
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| Ingredient {
+                id: r.id,
+                name: r.name,
+                default_unit: r.default_unit,
+                restock_threshold: r.restock_threshold,
+            })
+            .collect())
     }
 
     async fn create(&self, input: CreateIngredientInput) -> RepoResult<Ingredient> {
@@ -154,33 +202,35 @@ impl IngredientRepository for SqliteIngredientRepository {
     }
 
     async fn update(&self, id: &str, input: UpdateIngredientInput) -> RepoResult<()> {
-        // only update fields that were provided
+        let mut sets = vec![];
+        let mut params: Vec<String> = vec![];
+
         if let Some(name) = &input.name {
-            sqlx::query!("UPDATE ingredients SET name = ? WHERE id = ?", name, id)
-                .execute(&self.pool)
-                .await
-                .map_err(|e| e.to_string())?;
+            sets.push("name = ?".to_string());
+            params.push(name.clone());
         }
         if let Some(unit) = &input.default_unit {
-            sqlx::query!(
-                "UPDATE ingredients SET default_unit = ? WHERE id = ?",
-                unit,
-                id
-            )
-            .execute(&self.pool)
-            .await
-            .map_err(|e| e.to_string())?;
+            sets.push("default_unit = ?".to_string());
+            params.push(unit.clone());
         }
         if let Some(threshold) = input.restock_threshold {
-            sqlx::query!(
-                "UPDATE ingredients SET restock_threshold = ? WHERE id = ?",
-                threshold,
-                id
-            )
-            .execute(&self.pool)
-            .await
-            .map_err(|e| e.to_string())?;
+            sets.push("restock_threshold = ?".to_string());
+            params.push(threshold.to_string());
         }
+
+        if sets.is_empty() {
+            return Ok(());
+        }
+
+        params.push(id.to_string());
+        let query_str = format!("UPDATE ingredients SET {} WHERE id = ?", sets.join(", "));
+        let mut query = sqlx::query(&query_str);
+        for param in params {
+            query = query.bind(param);
+        }
+
+        query.execute(&self.pool).await.map_err(|e| e.to_string())?;
+
         Ok(())
     }
 

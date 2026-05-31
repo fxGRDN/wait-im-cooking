@@ -1,27 +1,26 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { getRecipes, getTags } from "$lib/services/recipes";
-    import type { Recipe, Tag, RecipeWithTree } from "$lib/types";
-    import {
-        Clock,
-        ChefHat,
-        Heart,
-        Search,
-        Filter,
-        X,
-        Plus,
-        History,
-    } from "lucide-svelte";
-    import { invoke, convertFileSrc } from "@tauri-apps/api/core";
+    import { checkAvailability } from "$lib/services/cooklog";
+    import type {
+        Recipe,
+        Tag,
+        RecipeWithTree,
+        AvailabilityResult,
+    } from "$lib/types";
+    import { Search, Filter, X, History, CheckCircle2 } from "lucide-svelte";
     import { settings } from "$lib/stores/settings";
+    import RecipeCard from "$lib/components/RecipeCard.svelte";
 
     let recipes: Recipe[] = $state([]);
     let tags: Tag[] = $state([]);
+    let availabilityMap = $state<Record<string, boolean>>({});
     let loading = $state(true);
 
     let searchQuery = $state("");
     let selectedTagIds = $state<string[]>([]);
     let showFilters = $state(false);
+    let filterCookable = $state(false);
 
     // We need to fetch full recipe trees to filter by tags accurately,
     // or the backend needs to provide tags in the basic get_recipes call.
@@ -40,30 +39,36 @@
                     .includes(searchQuery.toLowerCase()) ??
                     false);
 
-            // Note: Basic Recipe type doesn't have tags.
-            // To filter by tags properly, we'd need them in the list.
-            // I will update the backend or fetch trees if needed, but for now search is priority.
-            return matchesSearch;
+            const isCookable = !filterCookable || availabilityMap[recipe.id];
+
+            const matchesTags =
+                selectedTagIds.length === 0 ||
+                selectedTagIds.every((id) =>
+                    recipe.tags.some((t) => t.id === id),
+                );
+
+            return matchesSearch && isCookable && matchesTags;
         }),
     );
 
     onMount(async () => {
         try {
             [recipes, tags] = await Promise.all([getRecipes(), getTags()]);
+
+            // Fetch availability for each recipe in parallel
+            const availabilities = await Promise.all(
+                recipes.map((r) => checkAvailability(r.id)),
+            );
+
+            availabilities.forEach((a) => {
+                availabilityMap[a.recipe_id] = a.cookable;
+            });
         } catch (e) {
             console.error(e);
         } finally {
             loading = false;
         }
     });
-
-    function formatTime(minutes: number | null) {
-        if (!minutes) return null;
-        if (minutes < 60) return `${minutes}m`;
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        return m > 0 ? `${h}h ${m}m` : `${h}h`;
-    }
 
     function toggleTag(tagId: string) {
         if (selectedTagIds.includes(tagId)) {
@@ -97,7 +102,7 @@
                 <button
                     onclick={() => (showFilters = !showFilters)}
                     class="p-2 rounded-xl border border-line hover:bg-surface-raised transition {selectedTagIds.length >
-                    0
+                        0 || filterCookable
                         ? 'bg-accent/10 border-accent text-accent'
                         : 'text-foreground-muted'}"
                 >
@@ -130,30 +135,53 @@
 
         <!-- Filters Drawer/Section -->
         {#if showFilters}
-            <div class="pt-2 animate-in slide-in-from-top-2 duration-200">
-                <p
-                    class="text-xs font-bold text-foreground-subtle uppercase tracking-widest mb-2"
-                >
-                    Filter by Tags
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    {#each tags as tag}
+            <div
+                class="pt-2 animate-in slide-in-from-top-2 duration-200 space-y-4"
+            >
+                <div class="flex flex-col gap-2">
+                    <p
+                        class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
+                    >
+                        Availability
+                    </p>
+                    <div class="flex flex-wrap gap-2">
                         <button
-                            onclick={() => toggleTag(tag.id)}
-                            class="px-3 py-1.5 rounded-full text-xs font-medium border transition {selectedTagIds.includes(
-                                tag.id,
-                            )
-                                ? 'bg-accent text-background border-accent'
-                                : 'bg-surface text-foreground-muted border-line hover:border-accent/50'}"
+                            onclick={() => (filterCookable = !filterCookable)}
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 transition {filterCookable
+                                ? 'bg-success text-background border-success'
+                                : 'bg-surface text-foreground-muted border-line hover:border-success/50'}"
                         >
-                            {tag.name}
+                            <CheckCircle2 size={14} />
+                            Cookable Only
                         </button>
-                    {/each}
-                    {#if tags.length === 0}
-                        <p class="text-xs text-foreground-subtle italic">
-                            No tags found.
-                        </p>
-                    {/if}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <p
+                        class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
+                    >
+                        Filter by Tags
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        {#each tags as tag}
+                            <button
+                                onclick={() => toggleTag(tag.id)}
+                                class="px-3 py-1.5 rounded-full text-xs font-medium border transition {selectedTagIds.includes(
+                                    tag.id,
+                                )
+                                    ? 'bg-accent text-background border-accent'
+                                    : 'bg-surface text-foreground-muted border-line hover:border-accent/50'}"
+                            >
+                                {tag.name}
+                            </button>
+                        {/each}
+                        {#if tags.length === 0}
+                            <p class="text-xs text-foreground-subtle italic">
+                                No tags found.
+                            </p>
+                        {/if}
+                    </div>
                 </div>
             </div>
         {/if}
@@ -172,11 +200,12 @@
             <div class="text-center py-12 text-foreground-muted">
                 <Search size={48} class="mx-auto mb-4 opacity-20" />
                 <p>No recipes match your criteria.</p>
-                {#if searchQuery || selectedTagIds.length > 0}
+                {#if searchQuery || selectedTagIds.length > 0 || filterCookable}
                     <button
                         onclick={() => {
                             searchQuery = "";
                             selectedTagIds = [];
+                            filterCookable = false;
                         }}
                         class="mt-4 text-accent font-bold text-sm"
                     >
@@ -187,74 +216,10 @@
         {:else}
             <div class="grid grid-cols-1 gap-4">
                 {#each filteredRecipes as recipe}
-                    <a
-                        href="/recipes/{recipe.id}"
-                        class="bg-surface rounded-2xl border border-line shadow-sm overflow-hidden hover:border-accent/50 transition-all flex group h-28 sm:h-32"
-                    >
-                        {#if recipe.cover_image}
-                            <div
-                                class="w-28 h-full sm:w-32 shrink-0 overflow-hidden"
-                            >
-                                <img
-                                    src={convertFileSrc(recipe.cover_image)}
-                                    alt={recipe.title}
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                />
-                            </div>
-                        {:else}
-                            <div
-                                class="w-28 h-full sm:w-32 shrink-0 bg-surface-sunken flex items-center justify-center text-foreground-subtle"
-                            >
-                                <ChefHat size={32} strokeWidth={1.5} />
-                            </div>
-                        {/if}
-
-                        <div
-                            class="p-3 sm:p-4 flex-1 flex flex-col justify-between min-w-0"
-                        >
-                            <div>
-                                <div
-                                    class="flex justify-between items-start gap-2"
-                                >
-                                    <h2
-                                        class="text-sm sm:text-base font-bold group-hover:text-accent transition truncate"
-                                    >
-                                        {recipe.title}
-                                    </h2>
-                                    {#if recipe.is_favourite}
-                                        <Heart
-                                            size={16}
-                                            class="text-danger fill-current shrink-0"
-                                        />
-                                    {/if}
-                                </div>
-                                {#if recipe.description}
-                                    <p
-                                        class="text-xs text-foreground-muted line-clamp-2 mt-0.5 leading-snug"
-                                    >
-                                        {recipe.description}
-                                    </p>
-                                {/if}
-                            </div>
-
-                            <div
-                                class="flex items-center gap-3 text-[10px] sm:text-xs font-bold text-foreground-subtle uppercase tracking-wider"
-                            >
-                                {#if recipe.prep_time}
-                                    <span class="flex items-center gap-1">
-                                        <Clock size={12} />
-                                        {formatTime(recipe.prep_time)}
-                                    </span>
-                                {/if}
-                                {#if recipe.cook_time}
-                                    <span class="flex items-center gap-1">
-                                        <ChefHat size={12} />
-                                        {formatTime(recipe.cook_time)}
-                                    </span>
-                                {/if}
-                            </div>
-                        </div>
-                    </a>
+                    <RecipeCard
+                        {recipe}
+                        isCookable={!!availabilityMap[recipe.id]}
+                    />
                 {/each}
             </div>
         {/if}

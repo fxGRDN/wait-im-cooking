@@ -14,7 +14,7 @@ import type {
 export async function checkAvailability(
   recipe_id: string,
 ): Promise<AvailabilityResult> {
-  return invoke("check_availability", { recipe_id });
+  return invoke("check_availability", { recipeId: recipe_id });
 }
 
 // ─────────────────────────────────────────
@@ -24,7 +24,7 @@ export async function checkAvailability(
 export async function getCookLogs(
   recipe_id?: string,
 ): Promise<RecipeHistory[]> {
-  return invoke("get_cook_logs", { recipe_id });
+  return invoke("get_cook_logs", { recipeId: recipe_id });
 }
 
 export async function getCookLog(

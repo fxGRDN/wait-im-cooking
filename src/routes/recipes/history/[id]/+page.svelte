@@ -5,9 +5,14 @@
         getCookLog,
         updateCookLog,
         deleteCookLog,
+        checkAvailability,
     } from "$lib/services/cooklog";
-    import { getRecipe } from "$lib/services/recipes";
-    import type { RecipeHistoryWithImages, Recipe } from "$lib/types";
+    import { getRecipeWithTree } from "$lib/services/recipes";
+    import type {
+        RecipeHistoryWithImages,
+        RecipeWithTree,
+        AvailabilityResult,
+    } from "$lib/types";
     import {
         ChevronLeft,
         Star,
@@ -23,6 +28,9 @@
         Edit2,
         RotateCcw,
         MapPin,
+        Info,
+        AlertCircle,
+        CheckCircle,
     } from "lucide-svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { remove } from "@tauri-apps/plugin-fs";
@@ -30,13 +38,16 @@
     import { goto } from "$app/navigation";
     import ImageModal from "$lib/components/ImageModal.svelte";
 
+    import Badge from "$lib/components/Badge.svelte";
+
     const id = $page.params.id as string;
 
     // Check if we should start in edit mode (from cook completion)
     let isEditing = $state($page.url.searchParams.get("edit") === "true");
 
     let log = $state<RecipeHistoryWithImages | null>(null);
-    let recipe = $state<Recipe | null>(null);
+    let recipe = $state<RecipeWithTree | null>(null);
+    let availability = $state<AvailabilityResult | null>(null);
     let loading = $state(true);
     let saving = $state(false);
 
@@ -55,7 +66,8 @@
         try {
             log = await getCookLog(id);
             if (log) {
-                recipe = await getRecipe(log.recipe_id);
+                recipe = await getRecipeWithTree(log.recipe_id);
+                availability = await checkAvailability(log.recipe_id);
                 // Initialize form state
                 rating = log.rating || 5;
                 notes = log.notes || "";
@@ -105,8 +117,8 @@
                 },
             );
 
-            // Redirect back to history list
-            goto("/recipes/history");
+            // Redirect back to history list and replace the "edit" entry in history
+            goto("/recipes/history", { replaceState: true });
         } catch (e) {
             console.error(e);
             alert("Failed to update history.");
@@ -125,7 +137,7 @@
                     } catch (e) {}
                 }
             });
-            goto("/recipes/history");
+            goto("/recipes/history", { replaceState: true });
         } catch (e) {
             console.error(e);
         }
@@ -151,6 +163,12 @@
             imagesToRemove = [];
         }
         isEditing = false;
+        // Remove ?edit=true from URL without adding to history
+        goto(`/recipes/history/${id}`, {
+            replaceState: true,
+            keepFocus: true,
+            noScroll: true,
+        });
     }
 </script>
 
@@ -169,7 +187,7 @@
                 </button>
             {:else}
                 <button
-                    onclick={() => goto("/recipes/history")}
+                    onclick={() => history.back()}
                     class="p-2 -ml-2 hover:bg-surface-sunken rounded-full transition"
                 >
                     <ChevronLeft size={24} />
@@ -432,6 +450,69 @@
                     {:else}
                         <div class="text-lg font-bold">{duration}m</div>
                     {/if}
+                </div>
+            </section>
+
+            <!-- Pantry Impact -->
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3
+                        class="text-xs font-bold text-foreground-subtle uppercase tracking-widest"
+                    >
+                        Pantry Impact
+                    </h3>
+                    <div
+                        class="flex items-center gap-1 text-[10px] font-bold text-foreground-muted uppercase tracking-tighter"
+                    >
+                        <Info size={12} />
+                        Auto-deducted on complete
+                    </div>
+                </div>
+
+                <div
+                    class="bg-surface rounded-3xl border border-line shadow-sm divide-y divide-line overflow-hidden"
+                >
+                    {#each recipe.ingredients as ri}
+                        {@const isMissing = availability?.missing.some(
+                            (m) => m.ingredient.id === ri.ingredient.id,
+                        )}
+                        <div
+                            class="p-4 flex items-center justify-between gap-4"
+                        >
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-sm truncate">
+                                    {ri.ingredient.name}
+                                </div>
+                                <div
+                                    class="text-xs text-foreground-muted font-medium"
+                                >
+                                    {ri.quantity}
+                                    {ri.unit} used
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-end gap-1">
+                                {#if isMissing}
+                                    <Badge
+                                        label="Not Deducted"
+                                        icon={AlertCircle}
+                                        variant="danger"
+                                    />
+                                    <div
+                                        class="text-[9px] text-danger/70 font-bold max-w-[120px] text-right leading-tight"
+                                    >
+                                        Check units or stock
+                                    </div>
+                                {:else}
+                                    <Badge
+                                        label="Deducted"
+                                        icon={CheckCircle}
+                                        variant="success"
+                                    />
+                                {/if}
+                            </div>
+                        </div>
+                    {/each}
                 </div>
             </section>
 
