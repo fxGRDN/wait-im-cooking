@@ -13,7 +13,7 @@
         initialName?: string;
     } = $props();
 
-    let name = $state(initialName);
+    let name = $state("");
     let defaultUnit = $state(COMMON_UNITS[0]);
     let saving = $state(false);
     let error = $state<string | null>(null);

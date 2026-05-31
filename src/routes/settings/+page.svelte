@@ -316,6 +316,7 @@
                                 <div
                                     class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-line shadow-inner"
                                 >
+                                    <!-- svelte-ignore a11y_media_has_caption -->
                                     <video
                                         src={convertFileSrc(
                                             $settings.pickedVideo,
