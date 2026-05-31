@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { X, ZoomIn, ZoomOut, Download } from "lucide-svelte";
+    import { X, ZoomIn, ZoomOut, Download } from "@lucide/svelte";
     import { fade, scale } from "svelte/transition";
 
     let {

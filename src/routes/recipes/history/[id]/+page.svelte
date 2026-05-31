@@ -31,7 +31,7 @@
         Info,
         AlertCircle,
         CheckCircle,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { remove } from "@tauri-apps/plugin-fs";
     import { saveImages } from "$lib/utils";
@@ -47,7 +47,6 @@
 
     let log = $state<RecipeHistoryWithImages | null>(null);
     let recipe = $state<RecipeWithTree | null>(null);
-    let availability = $state<AvailabilityResult | null>(null);
     let loading = $state(true);
     let saving = $state(false);
 
@@ -67,7 +66,6 @@
             log = await getCookLog(id);
             if (log) {
                 recipe = await getRecipeWithTree(log.recipe_id);
-                availability = await checkAvailability(log.recipe_id);
                 // Initialize form state
                 rating = log.rating || 5;
                 notes = log.notes || "";
@@ -472,27 +470,24 @@
                 <div
                     class="bg-surface rounded-3xl border border-line shadow-sm divide-y divide-line overflow-hidden"
                 >
-                    {#each recipe.ingredients as ri}
-                        {@const isMissing = availability?.missing.some(
-                            (m) => m.ingredient.id === ri.ingredient.id,
-                        )}
+                    {#each log.ingredients as hi}
                         <div
                             class="p-4 flex items-center justify-between gap-4"
                         >
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-sm truncate">
-                                    {ri.ingredient.name}
+                                    {hi.name}
                                 </div>
                                 <div
                                     class="text-xs text-foreground-muted font-medium"
                                 >
-                                    {ri.quantity}
-                                    {ri.unit} used
+                                    {hi.quantity}
+                                    {hi.unit} used
                                 </div>
                             </div>
 
                             <div class="flex flex-col items-end gap-1">
-                                {#if isMissing}
+                                {#if !hi.was_deducted}
                                     <Badge
                                         label="Not Deducted"
                                         icon={AlertCircle}

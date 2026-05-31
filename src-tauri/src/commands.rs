@@ -1,6 +1,6 @@
 use crate::models::*;
 use crate::AppState;
-use tauri::{State};
+use tauri::State;
 
 // ─────────────────────────────────────────
 // Ingredients
@@ -151,7 +151,11 @@ pub async fn create_tag(name: String, state: State<'_, AppState>) -> Result<Tag,
 }
 
 #[tauri::command]
-pub async fn update_tag(id: String, name: String, state: State<'_, AppState>) -> Result<(), String> {
+pub async fn update_tag(
+    id: String,
+    name: String,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
     state.tags.update(&id, &name).await
 }
 
@@ -187,20 +191,21 @@ pub async fn create_cook_log(
 ) -> Result<String, String> {
     let consume = input.consume_from_pantry;
     let recipe_id = input.recipe_id.clone();
-    let servings = input.servings_made;
+    let servings = input.servings_made.unwrap_or(1) as f64;
 
-    let id = state.history.create(input).await?;
+    let ingredients = if consume {
+        state
+            .pantry
+            .consume_ingredients(&recipe_id, servings)
+            .await?
+    } else {
+        state
+            .pantry
+            .get_deduction_results(&recipe_id, servings)
+            .await?
+    };
 
-    if consume {
-        if let Some(s) = servings {
-            state
-                .pantry
-                .consume_ingredients(&recipe_id, s as f64)
-                .await?;
-        }
-    }
-
-    Ok(id)
+    state.history.create(input, ingredients).await
 }
 
 #[tauri::command]

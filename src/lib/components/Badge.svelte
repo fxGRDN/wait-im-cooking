@@ -1,5 +1,6 @@
 <script lang="ts">
     import { type Component } from "svelte";
+    import { type LucideProps } from "@lucide/svelte";
 
     let {
         label,
@@ -8,7 +9,7 @@
         class: className = "",
     } = $props<{
         label: string;
-        icon?: Component | null;
+        icon?: Component<LucideProps> | null;
         variant?: "default" | "success" | "danger" | "muted" | "accent";
         class?: string;
     }>();

@@ -12,7 +12,7 @@
         X,
         Edit2,
         AlertTriangle,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
 
     let ingredients: IngredientWithInventory[] = $state([]);
     let loading = $state(true);
@@ -191,7 +191,7 @@
                                         ? 'bg-danger/15 text-danger border border-danger/20'
                                         : 'bg-surface-sunken text-foreground-subtle border border-line'}"
                                 >
-                                    {ingredient.inventory.quantity}
+                                    {ingredient.inventory.quantity.toFixed(2)}
                                     {ingredient.inventory.unit}
                                 </span>
                             {/if}

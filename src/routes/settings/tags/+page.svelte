@@ -17,7 +17,7 @@
         Search,
         Edit2,
         Check,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { fade, slide } from "svelte/transition";
 
     let tags = $state<Tag[]>([]);

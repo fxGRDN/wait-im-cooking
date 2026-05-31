@@ -202,6 +202,8 @@ impl IngredientRepository for SqliteIngredientRepository {
     }
 
     async fn update(&self, id: &str, input: UpdateIngredientInput) -> RepoResult<()> {
+        let mut tx = self.pool.begin().await.map_err(|e| e.to_string())?;
+
         let mut sets = vec![];
         let mut params: Vec<String> = vec![];
 
@@ -212,25 +214,44 @@ impl IngredientRepository for SqliteIngredientRepository {
         if let Some(unit) = &input.default_unit {
             sets.push("default_unit = ?".to_string());
             params.push(unit.clone());
+
+            // Propagate unit change to all recipes using this ingredient
+            sqlx::query!(
+                "UPDATE recipe_ingredients SET unit = ? WHERE ingredient_id = ?",
+                unit,
+                id
+            )
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+
+            // Also update inventory unit
+            sqlx::query!(
+                "UPDATE ingredient_inventory SET unit = ? WHERE ingredient_id = ?",
+                unit,
+                id
+            )
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
         }
         if let Some(threshold) = input.restock_threshold {
             sets.push("restock_threshold = ?".to_string());
             params.push(threshold.to_string());
         }
 
-        if sets.is_empty() {
-            return Ok(());
+        if !sets.is_empty() {
+            params.push(id.to_string());
+            let query_str = format!("UPDATE ingredients SET {} WHERE id = ?", sets.join(", "));
+            let mut query = sqlx::query(&query_str);
+            for param in params {
+                query = query.bind(param);
+            }
+
+            query.execute(&mut *tx).await.map_err(|e| e.to_string())?;
         }
 
-        params.push(id.to_string());
-        let query_str = format!("UPDATE ingredients SET {} WHERE id = ?", sets.join(", "));
-        let mut query = sqlx::query(&query_str);
-        for param in params {
-            query = query.bind(param);
-        }
-
-        query.execute(&self.pool).await.map_err(|e| e.to_string())?;
-
+        tx.commit().await.map_err(|e| e.to_string())?;
         Ok(())
     }
 

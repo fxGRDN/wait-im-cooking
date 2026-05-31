@@ -112,9 +112,20 @@ export interface RecipeWithTree extends Recipe {
   steps: Step[];
   tags: Tag[];
 }
+export interface RecipeHistoryIngredient {
+  id: UUID;
+  history_id: UUID;
+  ingredient_id: UUID;
+  name: string;
+  quantity: number;
+  unit: string;
+  was_deducted: boolean;
+}
 
-export interface RecipeHistoryWithImages extends RecipeHistory {
+export interface RecipeHistoryWithImages {
+  history: RecipeHistory;
   images: RecipeHistoryImage[];
+  ingredients: RecipeHistoryIngredient[];
 }
 
 // ─────────────────────────────────────────

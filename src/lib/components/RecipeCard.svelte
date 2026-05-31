@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Recipe } from "$lib/types";
     import { convertFileSrc } from "@tauri-apps/api/core";
-    import { ChefHat, Clock, Heart, CheckCircle2 } from "lucide-svelte";
+    import { ChefHat, Clock, Heart, CheckCircle2 } from "@lucide/svelte";
     import Badge from "./Badge.svelte";
 
     let {

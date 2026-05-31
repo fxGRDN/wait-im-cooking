@@ -15,7 +15,7 @@
         ChefHat,
         History,
         TrendingUp,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
 
     let recentLogs = $state<RecipeHistory[]>([]);

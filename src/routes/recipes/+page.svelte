@@ -8,7 +8,7 @@
         RecipeWithTree,
         AvailabilityResult,
     } from "$lib/types";
-    import { Search, Filter, X, History, CheckCircle2 } from "lucide-svelte";
+    import { Search, Filter, X, History, CheckCircle2 } from "@lucide/svelte";
     import { settings } from "$lib/stores/settings";
     import RecipeCard from "$lib/components/RecipeCard.svelte";
 

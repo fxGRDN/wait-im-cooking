@@ -7,7 +7,7 @@
     } from "$lib/services/ingredients";
     import { COMMON_UNITS } from "$lib/utils";
     import type { IngredientWithInventory } from "$lib/types";
-    import { Trash2, Save, Loader2 } from "lucide-svelte";
+    import { Trash2, Save, Loader2 } from "@lucide/svelte";
 
     let {
         open = $bindable(false),
@@ -183,6 +183,38 @@
                         </select>
                     </div>
                 </div>
+
+                {#if ingredient && unit !== (ingredient.inventory?.unit ?? ingredient.default_unit)}
+                    <div
+                        class="flex items-start gap-2 p-3 bg-warning-soft text-warning-strong rounded-xl border border-warning/20 animate-in fade-in slide-in-from-top-1 duration-200"
+                    >
+                        <div class="mt-0.5 shrink-0">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-alert-triangle"
+                                ><path
+                                    d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+                                /><path d="M12 9v4" /><path
+                                    d="M12 17h.01"
+                                /></svg
+                            >
+                        </div>
+                        <p
+                            class="text-[10px] font-bold leading-tight uppercase tracking-tight"
+                        >
+                            Warning: Changing the unit will automatically update
+                            all recipes using this ingredient.
+                        </p>
+                    </div>
+                {/if}
 
                 <div class="space-y-2">
                     <label

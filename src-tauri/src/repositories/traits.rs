@@ -63,7 +63,11 @@ pub trait TagRepository: Send + Sync {
 pub trait RecipeHistoryRepository: Send + Sync {
     async fn find_all(&self, recipe_id: Option<&str>) -> RepoResult<Vec<RecipeHistory>>;
     async fn find_by_id(&self, id: &str) -> RepoResult<Option<RecipeHistoryWithImages>>;
-    async fn create(&self, input: CreateHistoryInput) -> RepoResult<String>;
+    async fn create(
+        &self,
+        input: CreateHistoryInput,
+        ingredients: Vec<DeductionResult>,
+    ) -> RepoResult<String>;
     async fn update(&self, id: &str, input: UpdateHistoryInput) -> RepoResult<Vec<String>>; // returns deleted file paths
     async fn delete(&self, id: &str) -> RepoResult<Vec<String>>; // returns file paths to clean up
 }
@@ -72,8 +76,26 @@ pub trait RecipeHistoryRepository: Send + Sync {
 // Pantry
 // ─────────────────────────────────────────
 
+pub struct DeductionResult {
+    pub ingredient_id: String,
+    pub name: String,
+    pub quantity: f64,
+    pub unit: String,
+    pub was_deducted: bool,
+}
+
 #[async_trait]
 pub trait PantryRepository: Send + Sync {
     async fn check_availability(&self, recipe_id: &str) -> RepoResult<AvailabilityResult>;
-    async fn consume_ingredients(&self, recipe_id: &str, servings_cooked: f64) -> RepoResult<()>;
+    async fn consume_ingredients(
+        &self,
+        recipe_id: &str,
+        servings_cooked: f64,
+    ) -> RepoResult<Vec<DeductionResult>>;
+
+    async fn get_deduction_results(
+        &self,
+        recipe_id: &str,
+        servings_cooked: f64,
+    ) -> RepoResult<Vec<DeductionResult>>;
 }

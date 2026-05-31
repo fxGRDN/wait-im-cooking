@@ -22,7 +22,7 @@
         Music,
         Trash2,
         Play,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { saveFiles } from "$lib/utils";

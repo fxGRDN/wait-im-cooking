@@ -12,7 +12,7 @@
         ChefHat,
         Edit2,
         ExternalLink,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { convertFileSrc } from "@tauri-apps/api/core";
     import { goto } from "$app/navigation";
 
@@ -67,6 +67,10 @@
     }
 
     function openEditPage(id: string) {
+        goto(`/recipes/history/${id}`);
+    }
+
+    function goToHistory(id: string) {
         goto(`/recipes/history/${id}`);
     }
 </script>
@@ -167,7 +171,10 @@
                             </div>
                         {/if}
 
-                        <div class="p-6 space-y-4">
+                        <button
+                            onclick={() => goToHistory(log.id)}
+                            class="p-6 space-y-4 text-left w-full hover:bg-surface-sunken/50 transition-colors"
+                        >
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 min-w-0">
                                     <h3
@@ -224,15 +231,20 @@
 
                                 <div class="flex items-center gap-2">
                                     <button
-                                        onclick={() =>
-                                            goToRecipe(log.recipe_id)}
+                                        onclick={(e) => {
+                                            e.stopPropagation();
+                                            goToRecipe(log.recipe_id);
+                                        }}
                                         class="p-2 text-foreground-subtle hover:text-accent hover:bg-accent/5 rounded-full transition"
                                         title="Go to Recipe"
                                     >
                                         <ExternalLink size={18} />
                                     </button>
                                     <button
-                                        onclick={() => openEditPage(log.id)}
+                                        onclick={(e) => {
+                                            e.stopPropagation();
+                                            openEditPage(log.id);
+                                        }}
                                         class="p-2 text-foreground-subtle hover:text-accent hover:bg-accent/5 rounded-full transition"
                                         title="Edit Cook"
                                     >
@@ -240,7 +252,7 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </button>
                     </div>
                 {/each}
             </div>

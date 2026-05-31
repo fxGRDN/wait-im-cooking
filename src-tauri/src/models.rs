@@ -121,7 +121,7 @@ pub struct RecipeHistory {
     pub created_at: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct RecipeHistoryImage {
     pub id: Uuid,
     pub history_id: Uuid,
@@ -129,11 +129,23 @@ pub struct RecipeHistoryImage {
     pub created_at: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
+pub struct RecipeHistoryIngredient {
+    pub id: Uuid,
+    pub history_id: Uuid,
+    pub ingredient_id: Uuid,
+    pub name: String,
+    pub quantity: f64,
+    pub unit: String,
+    pub was_deducted: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RecipeHistoryWithImages {
     #[serde(flatten)]
     pub history: RecipeHistory,
     pub images: Vec<RecipeHistoryImage>,
+    pub ingredients: Vec<RecipeHistoryIngredient>,
 }
 
 // ─────────────────────────────────────────

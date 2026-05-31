@@ -17,7 +17,7 @@
         CheckSquare,
         ChevronDown,
         ChevronUp,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { goto } from "$app/navigation";
     import { createCookLog } from "$lib/services/cooklog";
 
@@ -47,8 +47,10 @@
         }
 
         window.addEventListener("complete-cooking", handleComplete);
-        return () =>
-            window.removeEventListener("complete-cooking", handleComplete);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("complete-cooking", handleComplete);
     });
 
     $effect(() => {
