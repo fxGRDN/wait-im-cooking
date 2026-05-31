@@ -195,22 +195,19 @@
             const filteredComponents = editComponents.filter((c) => c.child_id);
             const filteredSteps = editSteps.filter((s) => s.description.trim());
 
-            await updateRecipe(
-                recipe.id,
-                {
-                    title: editTitle,
-                    description: editDescription,
-                    servings: editServings,
-                    prep_time: editPrepTime,
-                    cook_time: editCookTime,
-                    is_favourite: isFavourite,
-                    cover_image: editCoverImage,
-                },
-                filteredIngredients,
-                filteredComponents,
-                filteredSteps,
-                editTagIds,
-            );
+            await updateRecipe(recipe.id, {
+                title: editTitle,
+                description: editDescription,
+                servings: editServings,
+                prep_time: editPrepTime,
+                cook_time: editCookTime,
+                is_favourite: isFavourite,
+                cover_image: editCoverImage,
+                ingredients: filteredIngredients,
+                components: filteredComponents,
+                steps: filteredSteps,
+                tag_ids: editTagIds,
+            });
 
             // Reload data
             await loadRecipe();
@@ -723,4 +720,4 @@
     {/if}
 </div>
 
-<ImageModal bind:src={previewImage} />
+<ImageModal bind:src={previewImage} onClose={() => (previewImage = null)} />

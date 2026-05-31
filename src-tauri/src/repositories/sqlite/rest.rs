@@ -507,18 +507,14 @@ impl PantryRepository for SqlitePantryRepository {
         servings_cooked: f64,
     ) -> RepoResult<Vec<DeductionResult>> {
         let mut tx = self.pool.begin().await.map_err(|e| e.to_string())?;
-        let results = self
-            .deduct_tree(&mut tx, recipe_id, servings_cooked / 1.0)
-            .await?; // servings_cooked / servings
-                     // Wait, the ratio needs the tree.
+
         let tree = self
             .recipes
             .find_with_tree(recipe_id)
             .await?
             .ok_or("Not found")?;
         let ratio = servings_cooked / tree.servings.unwrap_or(1) as f64;
-        // Actually the deduct_tree takes recipe_id and ratio.
-        // I will re-implement this properly.
+
         let results = self.deduct_tree(&mut tx, recipe_id, ratio).await?;
         tx.commit().await.map_err(|e| e.to_string())?;
         Ok(results)

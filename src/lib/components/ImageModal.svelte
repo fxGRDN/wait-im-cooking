@@ -3,7 +3,7 @@
     import { fade, scale } from "svelte/transition";
 
     let {
-        src,
+        src = $bindable(),
         alt = "Image preview",
         onClose,
     }: {

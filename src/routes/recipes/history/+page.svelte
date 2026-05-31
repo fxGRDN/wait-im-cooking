@@ -34,7 +34,7 @@
                     const detail = await (
                         await import("$lib/services/cooklog")
                     ).getCookLog(log.id);
-                    return detail || { ...log, images: [] };
+                    return detail || { ...log, images: [], ingredients: [] };
                 }),
             );
 
@@ -171,9 +171,11 @@
                             </div>
                         {/if}
 
-                        <button
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div
                             onclick={() => goToHistory(log.id)}
-                            class="p-6 space-y-4 text-left w-full hover:bg-surface-sunken/50 transition-colors"
+                            class="p-6 space-y-4 text-left w-full hover:bg-surface-sunken/50 transition-colors cursor-pointer"
                         >
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 min-w-0">
@@ -252,7 +254,7 @@
                                     </button>
                                 </div>
                             </div>
-                        </button>
+                        </div>
                     </div>
                 {/each}
             </div>

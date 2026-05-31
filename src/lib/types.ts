@@ -122,8 +122,7 @@ export interface RecipeHistoryIngredient {
   was_deducted: boolean;
 }
 
-export interface RecipeHistoryWithImages {
-  history: RecipeHistory;
+export interface RecipeHistoryWithImages extends RecipeHistory {
   images: RecipeHistoryImage[];
   ingredients: RecipeHistoryIngredient[];
 }
@@ -132,7 +131,10 @@ export interface RecipeHistoryWithImages {
 // Input types  (for create / update)
 // ─────────────────────────────────────────
 
-export type RecipeInput = Omit<Recipe, "id" | "created_at" | "updated_at">;
+export type RecipeInput = Omit<
+  Recipe,
+  "id" | "created_at" | "updated_at" | "tags"
+>;
 
 export type StepInput = Omit<Step, "id" | "recipe_id">;
 

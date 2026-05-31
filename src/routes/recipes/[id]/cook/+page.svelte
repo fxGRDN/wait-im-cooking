@@ -39,6 +39,7 @@
 
     onMount(async () => {
         try {
+            if (!id) return;
             recipe = await getRecipeWithTree(id);
         } catch (e) {
             console.error(e);
